@@ -15,6 +15,10 @@
 		C4E50894285912AA0020EF3D /* MakeupGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50893285912AA0020EF3D /* MakeupGuideTests.swift */; };
 		C4E5089E285912AA0020EF3D /* MakeupGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */; };
 		C4E508A0285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */; };
+		C4E508AD28591FB50020EF3D /* VCHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AC28591FB50020EF3D /* VCHelpers.swift */; };
+		C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */; };
+		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
+		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +50,10 @@
 		C4E50899285912AA0020EF3D /* MakeupGuideUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MakeupGuideUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITests.swift; sourceTree = "<group>"; };
 		C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C4E508AC28591FB50020EF3D /* VCHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCHelpers.swift; sourceTree = "<group>"; };
+		C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetFaceBaseline.swift; sourceTree = "<group>"; };
+		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
+		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +106,8 @@
 			children = (
 				C4E50880285912A60020EF3D /* AppDelegate.swift */,
 				C4E50882285912A60020EF3D /* ContentView.swift */,
+				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
+				C4E508AE2859208D0020EF3D /* Helpers */,
 				C4E50884285912A60020EF3D /* Experience.rcproject */,
 				C4E50886285912AA0020EF3D /* Assets.xcassets */,
 				C4E50888285912AA0020EF3D /* Preview Content */,
@@ -128,6 +138,16 @@
 				C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */,
 			);
 			path = MakeupGuideUITests;
+			sourceTree = "<group>";
+		};
+		C4E508AE2859208D0020EF3D /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				C4E508AC28591FB50020EF3D /* VCHelpers.swift */,
+				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
+				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -261,8 +281,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4E50883285912A60020EF3D /* ContentView.swift in Sources */,
+				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
+				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
 				C4E50885285912A60020EF3D /* Experience.rcproject in Sources */,
+				C4E508AD28591FB50020EF3D /* VCHelpers.swift in Sources */,
+				C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
