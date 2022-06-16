@@ -6,6 +6,7 @@
 //
 
 import ARKit
+import SwiftUI
 
 
 /// change world coordinates to the coordinates of the camera
@@ -27,4 +28,10 @@ func changeCoordinates(currentFaceTransform: simd_float4x4, frame: ARFrame) -> s
     let transformInCameraSpace = originNode.convertTransform(newFaceMatrix, to: cameraNode)
 
     return simd_float4x4(transformInCameraSpace)
+}
+
+
+class Images {
+    let neckRotationImage = Image("NeckRotation")
+    let checkMark = Image("CheckMark")
 }

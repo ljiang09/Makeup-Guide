@@ -9,10 +9,13 @@ import SwiftUI
 import SceneKit
 import ARKit
 
-class ARSessionManager: NSObject {
+class ARSessionManager: NSObject, ObservableObject {
+    static var shared: ARSessionManager = ARSessionManager()
+    @Published var isNeckImageShowing: Bool = true
+    
     let sceneView = ARSCNView(frame: .zero)
     
-    static var shared: ARSessionManager = ARSessionManager()
+    var faceImages: [UIImage?] = [nil, nil, nil]
     
     private override init() {
         super.init()
@@ -54,7 +57,7 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         /// change the coordinate system to be the camera (mathematically)
         let x = changeCoordinates(currentFaceTransform: faceAnchor.transform, frame: sceneView.session.currentFrame!)
-        let faceAnchorTransform: [[Float]] = [[x[0][0], x[0][1], x[0][2], x[0][3]],
+        let faceAnchorTransform: [[Float]] = [[x[0][0], x[0][1], x[0][2], x[0][3]],     // column 0
                                               [x[1][0], x[1][1], x[1][2], x[1][3]],
                                               [x[2][0], x[2][1], x[2][2], x[2][3]],
                                               [x[3][0], x[3][1], x[3][2], x[3][3]]]
@@ -63,49 +66,39 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
-//
-//        /// every frame, check if we have successfully collected the images. If not, try to collect them
-//        if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
-//            DispatchQueue.main.async {
-//                self.neckRotationImage.isHidden = false
-//            }
-//
-//
-//            if (faceImages[0] == nil) {
-//                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
-//                    faceImages[0] = sceneView.snapshot()
-//                    print("head on image collected")
-////                    displayFaceImages.image = faceImages[0]
-//                }
-//            }
-//            if (faceImages[1] == nil) {
-//                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Rotated Left") {
-//                    faceImages[1] = sceneView.snapshot()
-//                    print("rotated left image collected")
-////                    displayFaceImages.image = faceImages[1]
-//                }
-//            }
-//            if (faceImages[2] == nil) {
-//                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Rotated Right") {
-//                    faceImages[2] = sceneView.snapshot()
-//                    print("rotated right image collected")
-////                    displayFaceImages.image = faceImages[2]
-//                }
-//            }
-//        }
-//        else {
-//            DispatchQueue.main.async {
-//                self.neckRotationImage.isHidden = true
-//            }
-//
-//            /// check orientation of face
-//            print(CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform))
-//            // variable to say if the face is not normal. if this variable changes, _____
-//            // doesn't go back to normal after 5 seconds
-//
-//            /// check position of face
-//            print(CheckFaceHelper.checkPositionOfFace(transformMatrix: faceAnchorTransform))
-//        }
+
+        /// every frame, check if we have successfully collected the images. If not, try to collect them
+        if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
+            if (faceImages[0] == nil) {
+                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
+                    faceImages[0] = sceneView.snapshot()
+                    print("head on image collected")
+                }
+            }
+            if (faceImages[1] == nil) {
+                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Rotated Left") {
+                    faceImages[1] = sceneView.snapshot()
+                    print("rotated left image collected")
+                }
+            }
+            if (faceImages[2] == nil) {
+                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Rotated Right") {
+                    faceImages[2] = sceneView.snapshot()
+                    print("rotated right image collected")
+                }
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                self.isNeckImageShowing = false
+            }
+            
+            print(CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform))
+            // variable to say if the face is not normal. if this variable changes, _____
+            // doesn't go back to normal after 5 seconds
+
+            print(CheckFaceHelper.checkPositionOfFace(transformMatrix: faceAnchorTransform))
+        }
         // TODO: check to make sure the snapshots are actually good
         
     }

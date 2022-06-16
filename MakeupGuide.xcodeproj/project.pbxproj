@@ -144,8 +144,8 @@
 			isa = PBXGroup;
 			children = (
 				C4E508AC28591FB50020EF3D /* VCHelpers.swift */,
-				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
 				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
+				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
