@@ -7,6 +7,8 @@
 
 
 class CheckFaceHelper {
+    let shared: CheckFaceHelper = CheckFaceHelper()
+    
     static func checkOrientationOfFace(transformMatrix: [[Float]]) -> String {
         /// thresholds for the `if` statements
         let th1: Float = 0.9
@@ -74,28 +76,51 @@ class CheckFaceHelper {
 
 
     static func checkPositionOfFace(transformMatrix: [[Float]]) -> String {
-    //    let th1: Float = 0.1
-    //    let th2: Float = 0.5
+        let thresholds = returnThresholds(z: transformMatrix[3][2])
         
-        if (transformMatrix[3][2] < -0.5) {
+        if (transformMatrix[3][2] < -0.75) {
             return "Face is too far away, move closer"
         }
         
         // these definitely need to be changed based on how far away the face is from the camera
-        if (transformMatrix[3][1] > 0.07) {
+        if (transformMatrix[3][1] > thresholds[2]*0.75) {
             return "Face is too far to the right"
         }
-        if (transformMatrix[3][1] < -0.07) {
+        if (transformMatrix[3][1] < thresholds[3]*0.75) {
             return "Face is too far to the left"
         }
-        if (transformMatrix[3][0] < -0.09) {
+        if (transformMatrix[3][0] < thresholds[1]*0.75) {
             return "Face is too far up"
         }
-        if (transformMatrix[3][0] > 0.09) {
+        if (transformMatrix[3][0] > thresholds[0]*0.75) {
             return "Face is too far down"
         }
         
         return ""
+    }
+    
+    
+    /// this function finds the horizontal and vertical bounds for the person's face in the screen, based purely on the z value.
+    fileprivate static func returnThresholds(z: Float) -> [Float] {
+        let thresholdScalars: [Float] = returnThresholdScalars(z: z)
+        
+        let bottomTH: Float = thresholdScalars[0] * z
+        let topTH: Float = thresholdScalars[1] * z
+        let rightTH: Float = thresholdScalars[2] * z
+        let leftTH: Float = thresholdScalars[3] * z
+        
+        return [bottomTH, topTH, rightTH, leftTH]
+    }
+    
+    /// this function is a helper function for `returnThresholds()`
+    /// note that the equations for the scalar were measured to where the phone stops detecting a face entirely, so when the thresholds are used, it's shrunk 25% in order to create a smaller valid screen area
+    fileprivate static func returnThresholdScalars(z: Float) -> [Float] {
+        let bottomScalar: Float = 0.520182*z - 0.324279
+        let topScalar: Float = -0.467471*z + 0.458133
+        let rightScalar: Float = 0.14423*z - 0.218682
+        let leftScalar: Float = -0.143561*z + 0.226603
+        
+        return [bottomScalar, topScalar, rightScalar, leftScalar]
     }
 
 }

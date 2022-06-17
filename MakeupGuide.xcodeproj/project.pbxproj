@@ -104,11 +104,11 @@
 		C4E5087F285912A60020EF3D /* MakeupGuide */ = {
 			isa = PBXGroup;
 			children = (
+				C4E50884285912A60020EF3D /* Experience.rcproject */,
 				C4E50880285912A60020EF3D /* AppDelegate.swift */,
 				C4E50882285912A60020EF3D /* ContentView.swift */,
 				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
 				C4E508AE2859208D0020EF3D /* Helpers */,
-				C4E50884285912A60020EF3D /* Experience.rcproject */,
 				C4E50886285912AA0020EF3D /* Assets.xcassets */,
 				C4E50888285912AA0020EF3D /* Preview Content */,
 			);
