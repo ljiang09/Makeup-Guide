@@ -15,7 +15,7 @@ class ARSessionManager: NSObject, ObservableObject {
     
     static var shared: ARSessionManager = ARSessionManager()
     
-    @Published var isNeckImageShowing: Bool = true
+    @Published var isNeckImageShowing: Bool
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     var faceImages: [UIImage?] = [nil, nil, nil]
     
@@ -25,9 +25,16 @@ class ARSessionManager: NSObject, ObservableObject {
     var faceOrientation: String = ""
     
     private override init() {
+        isNeckImageShowing = true
+        
         super.init()
         sceneView.session.run(ARFaceTrackingConfiguration())
         sceneView.delegate = self
+        
+        /// after half a second, state the instructions for the user to rotate their head around and such
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+        }
     }
     
     // TODO: have a on end function to pause the ar session and invalidate the timer?
@@ -123,8 +130,12 @@ extension ARSessionManager: ARSCNViewDelegate {
                 }
             }
             
+            // MARK: - Finish collecting images
             /// this runs once, right when the images just finished all getting collected
             if (faceImages[0] != nil && faceImages[1] != nil && faceImages[2] != nil) {
+                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+                // TODO: this plays but suddenly stops playing. it cuts out like right when it begins
+                
                 DispatchQueue.main.async {
                     self.isNeckImageShowing = false
                 }
@@ -134,6 +145,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
             }
+        
         }
         else {
             facePosition = CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform)

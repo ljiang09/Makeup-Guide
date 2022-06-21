@@ -20,6 +20,7 @@
 		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
 		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
 		C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F695912862206200C9E90A /* SoundHelpers.swift */; };
+		C4F695972862537400C9E90A /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C4F695962862537400C9E90A /* SuccessSound.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
 		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		C4F695912862206200C9E90A /* SoundHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundHelpers.swift; sourceTree = "<group>"; };
+		C4F695962862537400C9E90A /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = SuccessSound.wav; path = ../../../../Downloads/SuccessSound.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 				C4E50882285912A60020EF3D /* ContentView.swift */,
 				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
 				C4E508AE2859208D0020EF3D /* Helpers */,
+				C4F695932862353200C9E90A /* AudioFiles */,
 				C4E50886285912AA0020EF3D /* Assets.xcassets */,
 				C4E50888285912AA0020EF3D /* Preview Content */,
 			);
@@ -151,6 +154,14 @@
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		C4F695932862353200C9E90A /* AudioFiles */ = {
+			isa = PBXGroup;
+			children = (
+				C4F695962862537400C9E90A /* SuccessSound.wav */,
+			);
+			path = AudioFiles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -258,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4E5088A285912AA0020EF3D /* Preview Assets.xcassets in Resources */,
+				C4F695972862537400C9E90A /* SuccessSound.wav in Resources */,
 				C4E50887285912AA0020EF3D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
