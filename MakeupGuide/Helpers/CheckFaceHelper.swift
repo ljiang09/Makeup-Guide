@@ -1,9 +1,10 @@
-//
-//  CheckFaceHelper.swift
-//  MakeupGuide02
-//
-//  Created by Lily Jiang on 6/10/22.
-//
+/*
+CheckFaceHelper.swift
+MakeupGuide
+Created by Lily Jiang on 6/10/22
+
+This file holds 2 helper functions to check face position and orientation
+*/
 
 
 class CheckFaceHelper {

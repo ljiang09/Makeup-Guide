@@ -1,9 +1,10 @@
-//
-//  ContentView.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/14/22.
-//
+/*
+ContentView.swift
+MakeupGuide
+Created by Lily Jiang on 6/14/22
+
+This file draws the UI of the AR session. This includes the AR stream, overlaid images, etc.
+*/
 
 import SwiftUI
 import SceneKit

@@ -19,6 +19,7 @@
 		C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */; };
 		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
 		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
+		C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F695912862206200C9E90A /* SoundHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetFaceBaseline.swift; sourceTree = "<group>"; };
 		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
 		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
+		C4F695912862206200C9E90A /* SoundHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 				C4E508AC28591FB50020EF3D /* VCHelpers.swift */,
 				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
 				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
+				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4E50883285912A60020EF3D /* ContentView.swift in Sources */,
+				C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */,
 				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
 				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,

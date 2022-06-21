@@ -1,9 +1,8 @@
-//
-//  AppDelegate.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/14/22.
-//
+/*
+AppDelegate.swift
+MakeupGuide
+Created by Lily Jiang on 6/14/22
+*/
 
 import UIKit
 import SwiftUI

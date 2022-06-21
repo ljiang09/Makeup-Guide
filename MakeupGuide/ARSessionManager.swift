@@ -1,9 +1,10 @@
-//
-//  ARSessionManager.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/14/22.
-//
+/*
+ARSessionManager.swift
+MakeupGuide
+Created by Lily Jiang on 6/14/22
+
+This file manages the AR session and triggers commands such as informing the user where their face is on the screen via audio commands.
+*/
 
 import SwiftUI
 import SceneKit

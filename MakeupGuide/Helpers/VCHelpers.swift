@@ -1,9 +1,11 @@
-//
-//  VCHelpers.swift
-//  MakeupGuide02
-//
-//  Created by Lily Jiang on 6/13/22.
-//
+/*
+VCHelpers.swift
+MakeupGuide
+Created by Lily Jiang on 6/13/22
+
+This file holds a helper function to convert the face anchor transform matrix from world to camera coordinates.
+Note that the camera axes are oriented differently. +x points down and +y points to the right.
+*/
 
 import ARKit
 import SwiftUI
