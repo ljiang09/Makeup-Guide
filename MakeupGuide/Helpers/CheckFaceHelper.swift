@@ -23,7 +23,7 @@ class CheckFaceHelper {
             // [0][2] 0.12 -> 0.47
             // [2][1] -0.12 -> -0.47
             // [2][2] 0.99 -> 0.88
-            return "Rotated Left"
+            return "Face is rotated Left"
         }
         if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] < -th2)
             && (transformMatrix[2][1] > th2) && (transformMatrix[2][2] < th1)) {
@@ -31,7 +31,7 @@ class CheckFaceHelper {
             // [0][2] 0.15 -> -0.44
             // [2][1] -0.15 -> 0.44
             // [2][2] 0.99 -> 0.90
-            return "Rotated Right"
+            return "Face is rotated Right"
         }
         if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th4)
             && (transformMatrix[2][0] > th4) && (transformMatrix[2][2] < th1)) {
@@ -39,14 +39,14 @@ class CheckFaceHelper {
             // [1][2] 0.20 -> 0.58
             // [2][0] 0.20 -> 0.58
             // [2][2] 0.98 -> 0.81
-            return "Tilted Forward"
+            return "Face is tilted Forward"
         }
         if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -0.5) && (transformMatrix[2][0] < -0.5) && (transformMatrix[2][2] < th1)) {
             // [1][0] -1 -> -0.83
             // [1][2] 0 -> -0.55
             // [2][0] 0 -> -0.55
             // [2][2] 1 -> 0.83
-            return "Tilted Backward"
+            return "Face is tilted Backward"
         }
 
         /// I commented all these out because I don't think tilt left/right matters
