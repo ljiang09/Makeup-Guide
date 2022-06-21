@@ -25,11 +25,12 @@ struct ContentView : View {
                     .frame(width: 200, height: 200)
                     .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
                     .onDisappear {
-                        showImage()
+                        showCheckImage()
                     }
             }
             
             if self.showingCheckImage {
+                // TODO: chang ethis to be animated somehow
                 Images().checkMark
                     .resizable()
                     .frame(width: 200, height: 200)
@@ -38,11 +39,10 @@ struct ContentView : View {
         }
     }
     
-    private func showImage() {
+    private func showCheckImage() {
         self.showingCheckImage = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.showingCheckImage = false
-            print("check image should disappear")
         }
     }
 }

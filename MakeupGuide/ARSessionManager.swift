@@ -10,11 +10,11 @@ import SceneKit
 import ARKit
 
 class ARSessionManager: NSObject, ObservableObject {
-    static var shared: ARSessionManager = ARSessionManager()
-    @Published var isNeckImageShowing: Bool = true
-    
     let sceneView = ARSCNView(frame: .zero)
     
+    static var shared: ARSessionManager = ARSessionManager()
+    
+    @Published var isNeckImageShowing: Bool = true
     var faceImages: [UIImage?] = [nil, nil, nil]
     
     private override init() {
@@ -66,7 +66,6 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
-
         /// every frame, check if we have successfully collected the images. If not, try to collect them
         if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
             if (faceImages[0] == nil) {
@@ -74,6 +73,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                     faceImages[0] = sceneView.snapshot()
                     print("head on image collected")
                 }
+                // TODO: check to make sure the snapshots are actually good
             }
             if (faceImages[1] == nil) {
                 if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Rotated Left") {
@@ -87,19 +87,23 @@ extension ARSessionManager: ARSCNViewDelegate {
                     print("rotated right image collected")
                 }
             }
+            
+            /// this runs once, right when the images just finished all getting collected
+            if (faceImages[0] != nil && faceImages[1] != nil && faceImages[2] != nil) {
+                DispatchQueue.main.async {
+                    self.isNeckImageShowing = false
+                }
+                
+                // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
+            }
         }
         else {
-            DispatchQueue.main.async {
-                self.isNeckImageShowing = false
-            }
-            
             print(CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform))
             // variable to say if the face is not normal. if this variable changes, _____
             // doesn't go back to normal after 5 seconds
-
+            
             print(CheckFaceHelper.checkPositionOfFace(transformMatrix: faceAnchorTransform))
         }
-        // TODO: check to make sure the snapshots are actually good
         
     }
     
