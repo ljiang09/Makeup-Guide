@@ -19,8 +19,9 @@ class ARSessionManager: NSObject, ObservableObject {
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     var faceImages: [UIImage?] = [nil, nil, nil]
     
-    /// initialize timer without starting it yet
-    var timer: Timer! = nil
+    /// initialize timers without starting them yet
+    var timer1: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
+    var timer2: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     var facePosition: String = ""
     var faceOrientation: String = ""
     
@@ -35,33 +36,64 @@ class ARSessionManager: NSObject, ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
         }
+        
+        /// start the first timer, which reminds the user every 8 seconds to rotate their head
+        self.fireTimer1()
     }
     
     // TODO: have a on end function to pause the ar session and invalidate the timer?
     
     
-    func fireTimer() {
-        /// initialize timer
-        timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
-            self.onTimerReset()
+    func fireTimer1() {
+        timer1 = Timer(fire: Date(), interval: 8.0, repeats: true, block: { _ in
+            self.onTimer1Reset()
         })
-        timer.tolerance = 0.1
-        
+        timer1.tolerance = 0.4
         /// start the timer
-        RunLoop.current.add(timer, forMode: .default)
-        print("Timer fired!")
+        RunLoop.current.add(timer1, forMode: .default)
+        print("Timer 1 fired!")
     }
     
-    func onTimerReset() {
-        /// check the face orientation and speak when necessary
-//        print("timer reset")
-        
+    func fireTimer2() {
+        /// initialize timer
+        timer2 = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
+            self.onTimer2Reset()
+        })
+        timer2.tolerance = 0.1
+        /// start the timer
+        RunLoop.current.add(timer2, forMode: .default)
+        print("Timer 2 fired!")
+    }
+    
+    func onTimer1Reset() {
+        // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
+        /// remind the user to position their head in the screen
+        print("position your head in the center of the screen and rotate it left and right")
+        SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+        /// state where the user's face is and orientation
         if facePosition != "" {
-            print(facePosition)
+            // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                SoundHelper.shared.announce(announcement: self.facePosition)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    SoundHelper.shared.announce(announcement: self.faceOrientation)
+                }
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                SoundHelper.shared.announce(announcement: self.faceOrientation)
+            }
+        }
+    }
+    
+    func onTimer2Reset() {
+        /// check the face orientation and speak when necessary
+        if facePosition != "" {
+            SoundHelper.shared.announce(announcement: facePosition)
         }
         
         if faceOrientation != "" {
-            print(faceOrientation)
+            SoundHelper.shared.announce(announcement: faceOrientation)
         }
     }
 }
@@ -111,49 +143,51 @@ extension ARSessionManager: ARSCNViewDelegate {
         /// every frame, check if we have successfully collected the images. If not, try to collect them
         if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
             if (faceImages[0] == nil) {
-                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
+                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
                     faceImages[0] = sceneView.snapshot()
                     print("head on image collected")
                 }
                 // TODO: check to make sure the snapshots are actually good
             }
             if (faceImages[1] == nil) {
-                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Face is rotated Left") {
+                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedLeft) {
                     faceImages[1] = sceneView.snapshot()
                     print("rotated left image collected")
                 }
             }
             if (faceImages[2] == nil) {
-                if (CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "Face is rotated Right") {
+                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedRight) {
                     faceImages[2] = sceneView.snapshot()
                     print("rotated right image collected")
                 }
             }
             
+            
             // MARK: - Finish collecting images
             /// this runs once, right when the images just finished all getting collected
             if (faceImages[0] != nil && faceImages[1] != nil && faceImages[2] != nil) {
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
-                // TODO: this plays but suddenly stops playing. it cuts out like right when it begins
                 
+                /// hide the instructional image
                 DispatchQueue.main.async {
                     self.isNeckImageShowing = false
                 }
                 
-                /// initialize and start the timer
-                fireTimer()
+                /// stop timer 1
+                timer1.invalidate()
+                
+                /// initialize and start timer 2
+                fireTimer2()
                 
                 // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
             }
         
         }
-        else {
-            facePosition = CheckFaceHelper.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
-            // variable to say if the face is not normal. if this variable changes, _____
-            // doesn't go back to normal after 5 seconds
-            
-            faceOrientation = CheckFaceHelper.checkPositionOfFace(transformMatrix: faceAnchorTransform)
-        }
+        facePosition = CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
+        // variable to say if the face is not normal. if this variable changes, _____
+        // doesn't go back to normal after 5 seconds
+        
+        faceOrientation = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         
     }
     

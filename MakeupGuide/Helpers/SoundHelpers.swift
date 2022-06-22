@@ -26,11 +26,16 @@ class SoundHelper: NSObject {
     let synthesizer = AVSpeechSynthesizer()     /// this should only be created once because it is memory intensive
     var player: AVAudioPlayer?
     
-    let rotateHeadInstructions = "move your head left and right"
-    
-    
-    
-    
+    /// the voiceover callouts for face positioning
+    let rotateHeadInstructions = "slowly turn your head back and forth"
+    let headPosRight = "face is too far right of the camera"
+    let headPosLeft = "face is too far left of the camera"
+    let headPosTop = "face is too high in the camera"
+    let headPosBottom = "face is too low in the camera"
+    let headRotateRight = "face is rotated right"
+    let headRotateLeft = "face is rotated left"
+    let headTiltUp = "face is tilted up"
+    let headTiltDown = "face is tilted down"
     
     
     private var currentAnnouncement: String?        /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
@@ -112,13 +117,13 @@ class SoundHelper: NSObject {
         
         // VoiceOver is the preferred option for TTS
         if UIAccessibility.isVoiceOverRunning {
-            print("voice over")
+//            print("voice over")
             currentAnnouncement = announcement
             UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)
         }
         // but if the user hasn't enabled VoiceOver, use a synthesizer
         else {
-            print("synthesizer")
+//            print("synthesizer")
             let audioSession = AVAudioSession.sharedInstance()
             
             do {

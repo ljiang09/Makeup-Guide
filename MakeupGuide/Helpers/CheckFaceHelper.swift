@@ -8,15 +8,19 @@ This file holds 2 helper functions to check face position and orientation
 
 
 class CheckFaceHelper {
-    let shared: CheckFaceHelper = CheckFaceHelper()
+    static let shared: CheckFaceHelper = CheckFaceHelper()
     
-    static func checkOrientationOfFace(transformMatrix: [[Float]]) -> String {
+    let rotatedLeft = "Face is rotated left"
+    let rotatedRight = "Face is rotated right"
+    let tiltedForward = "Face is tilted forward"
+    let tiltedBackward = "Face is tilted backward"
+    
+    
+    func checkOrientationOfFace(transformMatrix: [[Float]]) -> String {
         /// thresholds for the `if` statements
         let th1: Float = 0.9
         let th2: Float = 0.3
-    //    let th3: Float = 0.8
-        let th4: Float = 0.5
-    //    let th5: Float = 0.15
+        let th3: Float = 0.5
         
         if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] > th2)
             && (transformMatrix[2][1] < -th2) && (transformMatrix[2][2] < th1)) {
@@ -24,7 +28,7 @@ class CheckFaceHelper {
             // [0][2] 0.12 -> 0.47
             // [2][1] -0.12 -> -0.47
             // [2][2] 0.99 -> 0.88
-            return "Face is rotated Left"
+            return rotatedLeft
         }
         if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] < -th2)
             && (transformMatrix[2][1] > th2) && (transformMatrix[2][2] < th1)) {
@@ -32,22 +36,22 @@ class CheckFaceHelper {
             // [0][2] 0.15 -> -0.44
             // [2][1] -0.15 -> 0.44
             // [2][2] 0.99 -> 0.90
-            return "Face is rotated Right"
+            return rotatedRight
         }
-        if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th4)
-            && (transformMatrix[2][0] > th4) && (transformMatrix[2][2] < th1)) {
+        if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th3)
+            && (transformMatrix[2][0] > th3) && (transformMatrix[2][2] < th1)) {
             // [1][0] -0.98 -> -0.81
             // [1][2] 0.20 -> 0.58
             // [2][0] 0.20 -> 0.58
             // [2][2] 0.98 -> 0.81
-            return "Face is tilted Forward"
+            return tiltedForward
         }
         if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -0.5) && (transformMatrix[2][0] < -0.5) && (transformMatrix[2][2] < th1)) {
             // [1][0] -1 -> -0.83
             // [1][2] 0 -> -0.55
             // [2][0] 0 -> -0.55
             // [2][2] 1 -> 0.83
-            return "Face is tilted Backward"
+            return tiltedBackward
         }
 
         /// I commented all these out because I don't think tilt left/right matters
@@ -76,7 +80,7 @@ class CheckFaceHelper {
 
 
 
-    static func checkPositionOfFace(transformMatrix: [[Float]]) -> String {
+    func checkPositionOfFace(transformMatrix: [[Float]]) -> String {
         let thresholds = returnThresholds(z: transformMatrix[3][2])
         
         if (transformMatrix[3][2] < -0.75) {
@@ -102,7 +106,7 @@ class CheckFaceHelper {
     
     
     /// this function finds the horizontal and vertical bounds for the person's face in the screen, based purely on the z value.
-    fileprivate static func returnThresholds(z: Float) -> [Float] {
+    fileprivate func returnThresholds(z: Float) -> [Float] {
         let thresholdScalars: [Float] = returnThresholdScalars(z: z)
         
         let bottomTH: Float = thresholdScalars[0] * z
@@ -115,7 +119,7 @@ class CheckFaceHelper {
     
     /// this function is a helper function for `returnThresholds()`
     /// note that the equations for the scalar were measured to where the phone stops detecting a face entirely, so when the thresholds are used, it's shrunk 25% in order to create a smaller valid screen area
-    fileprivate static func returnThresholdScalars(z: Float) -> [Float] {
+    fileprivate func returnThresholdScalars(z: Float) -> [Float] {
         let bottomScalar: Float = 0.520182*z - 0.324279
         let topScalar: Float = -0.467471*z + 0.458133
         let rightScalar: Float = 0.14423*z - 0.218682
