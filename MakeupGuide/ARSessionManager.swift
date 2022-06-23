@@ -19,57 +19,101 @@ class ARSessionManager: NSObject, ObservableObject {
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     var faceImages: [UIImage?] = [nil, nil, nil]
     
+    var facePosition: String = "blank"
+    var faceOrientation: String = "blank"
+    
     /// initialize timers without starting them yet
-    var timer1: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
-    var timer2: Timer! = nil        // for checking the face position. Repeats every 3 seconds
-    var facePosition: String = ""
-    var faceOrientation: String = ""
+    var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
+    var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
     private override init() {
-        isNeckImageShowing = true
+        isNeckImageShowing = false
         
         super.init()
         sceneView.session.run(ARFaceTrackingConfiguration())
         sceneView.delegate = self
         
-        /// after half a second, state the instructions for the user to rotate their head around and such
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+        
+        /// after half a second, call function to check whether the user's face is positioned well in the screen.
+        /// once the face is centered, run the next phase of face rotation/snapshot gathering
+        /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.checkFaceUntilRepositioned(completion: {
+                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+                // TODO: show the check mark image here
+                
+                /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.isNeckImageShowing = true
+                    SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+                    
+                    /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                    self.firetimer2()
+                }
+            })
         }
         
-        /// start the first timer, which reminds the user every 8 seconds to rotate their head
-        self.fireTimer1()
     }
     
     // TODO: have a on end function to pause the ar session and invalidate the timer?
     
     
-    func fireTimer1() {
-        timer1 = Timer(fire: Date(), interval: 8.0, repeats: true, block: { _ in
-            self.onTimer1Reset()
+    /// this function is intended to run at the beginning of the app lifecycle
+    /// it is also optionally called whenever the user's face is continually not centered
+    ///
+    /// it continually checks the face position until the face is centered and then runs the closure
+    func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
+        let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
+            if ((self.facePosition == "") && (self.faceOrientation == "")) {
+                timer1.invalidate()
+                completion()
+            }
+            
+            if ((self.facePosition != "") || (self.facePosition != "blank")) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    SoundHelper.shared.announce(announcement: self.facePosition)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        SoundHelper.shared.announce(announcement: self.faceOrientation)
+                    }
+                }
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    SoundHelper.shared.announce(announcement: self.faceOrientation)
+                }
+            }
         })
-        timer1.tolerance = 0.4
-        /// start the timer
+        timer1.tolerance = 0.2
         RunLoop.current.add(timer1, forMode: .default)
+    }
+    
+    
+    
+    func firetimer2() {
+        timer2 = Timer(fire: Date(), interval: 8.0, repeats: true, block: { _ in
+            self.ontimer2Reset()
+        })
+        timer2.tolerance = 0.4
+        /// start the timer
+        RunLoop.current.add(timer2, forMode: .default)
         print("Timer 1 fired!")
     }
     
-    func fireTimer2() {
+    func firetimer3() {
         /// initialize timer
-        timer2 = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
-            self.onTimer2Reset()
+        timer3 = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
+            self.ontimer3Reset()
         })
-        timer2.tolerance = 0.1
+        timer3.tolerance = 0.1
         /// start the timer
-        RunLoop.current.add(timer2, forMode: .default)
+        RunLoop.current.add(timer3, forMode: .default)
         print("Timer 2 fired!")
     }
     
-    func onTimer1Reset() {
+    func ontimer2Reset() {
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
-        print("position your head in the center of the screen and rotate it left and right")
         SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+        
         /// state where the user's face is and orientation
         if facePosition != "" {
             // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
@@ -86,7 +130,7 @@ class ARSessionManager: NSObject, ObservableObject {
         }
     }
     
-    func onTimer2Reset() {
+    func ontimer3Reset() {
         /// check the face orientation and speak when necessary
         if facePosition != "" {
             SoundHelper.shared.announce(announcement: facePosition)
@@ -168,16 +212,17 @@ extension ARSessionManager: ARSCNViewDelegate {
             if (faceImages[0] != nil && faceImages[1] != nil && faceImages[2] != nil) {
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
+                
                 /// hide the instructional image
                 DispatchQueue.main.async {
                     self.isNeckImageShowing = false
                 }
                 
                 /// stop timer 1
-                timer1.invalidate()
+                timer2.invalidate()
                 
                 /// initialize and start timer 2
-                fireTimer2()
+                firetimer3()
                 
                 // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
             }

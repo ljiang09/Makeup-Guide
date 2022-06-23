@@ -31,7 +31,6 @@ struct ContentView : View {
             }
             
             if self.showingCheckImage {
-                // TODO: chang ethis to be animated somehow
                 Images().checkMark
                     .resizable()
                     .frame(width: 200, height: 200)
