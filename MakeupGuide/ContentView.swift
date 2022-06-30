@@ -19,11 +19,6 @@ struct ContentView : View {
         return ZStack {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
-            Button("Export Texture Map", action: {
-                print("exported")
-                arManager.exportTextureMapToPhotos()
-            })
-            
             if arManager.isNeckImageShowing {
                 // TODO: voice telling them to position their head in the screen and move it side to side
                 Images().neckRotationImage

@@ -230,7 +230,9 @@ extension ARSessionManager: ARSCNViewDelegate {
             if (faceImages[0] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
                     faceImages[0] = sceneView.snapshot()
-                    self.exportTextureMapToPhotos()
+                    DispatchQueue.main.async {
+                        self.exportTextureMapToPhotos()
+                    }
                     print("head on image collected")
                 }
                 // TODO: check to make sure the snapshots are actually good
