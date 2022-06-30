@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C44E806F2866377400550CE8 /* FaceTextureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E806E2866377400550CE8 /* FaceTextureGenerator.swift */; };
+		C44E80712866383C00550CE8 /* ARControllerTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80702866383C00550CE8 /* ARControllerTexture.swift */; };
+		C44E80732866386500550CE8 /* TextureToImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80722866386500550CE8 /* TextureToImage.swift */; };
+		C44E8075286641B500550CE8 /* faceTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = C44E8074286641B500550CE8 /* faceTexture.metal */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
 		C4E50885285912A60020EF3D /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = C4E50884285912A60020EF3D /* Experience.rcproject */; };
@@ -15,7 +19,7 @@
 		C4E50894285912AA0020EF3D /* MakeupGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50893285912AA0020EF3D /* MakeupGuideTests.swift */; };
 		C4E5089E285912AA0020EF3D /* MakeupGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */; };
 		C4E508A0285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */; };
-		C4E508AD28591FB50020EF3D /* VCHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AC28591FB50020EF3D /* VCHelpers.swift */; };
+		C4E508AD28591FB50020EF3D /* VCGeneralHelpersHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AC28591FB50020EF3D /* VCGeneralHelpersHelpers.swift */; };
 		C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */; };
 		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
 		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
@@ -41,6 +45,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C44E806E2866377400550CE8 /* FaceTextureGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceTextureGenerator.swift; sourceTree = "<group>"; };
+		C44E80702866383C00550CE8 /* ARControllerTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARControllerTexture.swift; sourceTree = "<group>"; };
+		C44E80722866386500550CE8 /* TextureToImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureToImage.swift; sourceTree = "<group>"; };
+		C44E8074286641B500550CE8 /* faceTexture.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = faceTexture.metal; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,7 +60,7 @@
 		C4E50899285912AA0020EF3D /* MakeupGuideUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MakeupGuideUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITests.swift; sourceTree = "<group>"; };
 		C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		C4E508AC28591FB50020EF3D /* VCHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCHelpers.swift; sourceTree = "<group>"; };
+		C4E508AC28591FB50020EF3D /* VCGeneralHelpersHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCGeneralHelpersHelpers.swift; sourceTree = "<group>"; };
 		C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetFaceBaseline.swift; sourceTree = "<group>"; };
 		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
 		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
@@ -85,6 +93,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C44E806D2866374D00550CE8 /* FaceTexture */ = {
+			isa = PBXGroup;
+			children = (
+				C44E806E2866377400550CE8 /* FaceTextureGenerator.swift */,
+				C44E80702866383C00550CE8 /* ARControllerTexture.swift */,
+				C44E80722866386500550CE8 /* TextureToImage.swift */,
+				C44E8074286641B500550CE8 /* faceTexture.metal */,
+			);
+			path = FaceTexture;
+			sourceTree = "<group>";
+		};
 		C4E50874285912A50020EF3D = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +131,7 @@
 				C4E50880285912A60020EF3D /* AppDelegate.swift */,
 				C4E50882285912A60020EF3D /* ContentView.swift */,
 				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
+				C44E806D2866374D00550CE8 /* FaceTexture */,
 				C4E508AE2859208D0020EF3D /* Helpers */,
 				C4F695932862353200C9E90A /* AudioFiles */,
 				C4E50886285912AA0020EF3D /* Assets.xcassets */,
@@ -148,7 +168,7 @@
 		C4E508AE2859208D0020EF3D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				C4E508AC28591FB50020EF3D /* VCHelpers.swift */,
+				C4E508AC28591FB50020EF3D /* VCGeneralHelpersHelpers.swift */,
 				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
 				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
@@ -295,13 +315,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C44E80712866383C00550CE8 /* ARControllerTexture.swift in Sources */,
+				C44E806F2866377400550CE8 /* FaceTextureGenerator.swift in Sources */,
 				C4E50883285912A60020EF3D /* ContentView.swift in Sources */,
 				C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */,
 				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
 				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
 				C4E50885285912A60020EF3D /* Experience.rcproject in Sources */,
-				C4E508AD28591FB50020EF3D /* VCHelpers.swift in Sources */,
+				C4E508AD28591FB50020EF3D /* VCGeneralHelpersHelpers.swift in Sources */,
+				C44E80732866386500550CE8 /* TextureToImage.swift in Sources */,
+				C44E8075286641B500550CE8 /* faceTexture.metal in Sources */,
 				C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,6 +489,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save UV unwrapping for testing purposes.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -476,7 +501,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ljiang.MakeupGuide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -497,6 +522,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save UV unwrapping for testing purposes.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -508,7 +534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ljiang.MakeupGuide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

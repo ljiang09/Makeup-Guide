@@ -10,7 +10,7 @@ import SwiftUI
 import SceneKit
 import ARKit
 
-
+// is there a way to call the shared instance of the manager, inside the manager class? 
 struct ContentView : View {
     @ObservedObject var arManager = ARSessionManager.shared
     @State private var showingCheckImage = false
@@ -18,6 +18,11 @@ struct ContentView : View {
     var body: some View {
         return ZStack {
             ARViewContainer().edgesIgnoringSafeArea(.all)
+            
+            Button("Export Texture Map", action: {
+                print("exported")
+                arManager.exportTextureMapToPhotos()
+            })
             
             if arManager.isNeckImageShowing {
                 // TODO: voice telling them to position their head in the screen and move it side to side
@@ -51,20 +56,9 @@ struct ContentView : View {
 struct ARViewContainer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> ARSCNView {
-        
         return ARSessionManager.shared.sceneView
-        
     }
     
     func updateUIView(_ uiView: ARSCNView, context: Context) {}
     
 }
-
-//
-//#if DEBUG
-//struct ContentView_Previews : PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
-//#endif
