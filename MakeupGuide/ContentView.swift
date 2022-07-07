@@ -20,6 +20,8 @@ struct ContentView : View {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
             Button(action: {
+                arManager.saveTextures2()
+                
                 print("run code to get 3 more UV maps. then run code to compare the two")
                 // i think this needs to be in the form of changing an observed variable in the ar sessio nmanager? and when it is set to true then run code in the renderer()? idk
             }, label: {

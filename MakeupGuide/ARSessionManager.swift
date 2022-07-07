@@ -24,7 +24,7 @@ class ARSessionManager: NSObject, ObservableObject {
     @Published var isNeckImageShowing: Bool
     @Published var isCheckImageShowing: Bool
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-    var faceImages: [UIImage?] = [nil, nil, nil]
+    var faceImagesCollected: [Bool] = [false, false, false, false, false, false]   /// 0-2 are for first set, 3-5 for last set
     
     var facePosition: String = "blank"
     var faceOrientation: String = "blank"
@@ -176,9 +176,48 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     
+    /// this is called to save the first batch of textures, right when the app is opened
+    private func saveTextures1() {
+        print("saving textures 1...")
+        
+        collectFaceImage(whichImage: 0, expectedImage: "blank", fileName: "HeadOn1")
+        collectFaceImage(whichImage: 1, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft1")
+        collectFaceImage(whichImage: 2, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight1")
+        
+        print("done saving textures 1!")
+    }
+    
+    /// this is called to save the second batch of textures, when the user clicks the button
+    public func saveTextures2() {
+        print("saving textures 2...")
+        
+        // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
+        // TODO: check to make sure the snapshots are actually good
+        
+        collectFaceImage(whichImage: 3, expectedImage: "blank", fileName: "HeadOn2")
+        collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
+        collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
+        
+        print("done saving textures 2!")
+    }
+    
+    
+    /// collects 1 texture. helper function for saveTextures1 and saveTextures2
+    private func collectFaceImage(whichImage: Int, expectedImage: String, fileName: String) {
+        if (!faceImagesCollected[whichImage]) {
+            if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == expectedImage) {
+                faceImagesCollected[whichImage] = true
+                DispatchQueue.main.async {
+                    self.exportTextureMap(fileName: fileName)
+                }
+            }
+        }
+    }
+    
+    
     // MARK: Export to documents folder with name `fileName`
     /// fileName is the name you want to reference the file with, and the name to which it is saved on the UserDefaults
-    public func exportTextureMap(fileName: String) {
+    private func exportTextureMap(fileName: String) {
         if let uiImage = textureToImage(faceUvGenerator.texture) {
             
             // access documents directory
@@ -216,6 +255,11 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
 }
+
+
+
+
+
 
 
 // MARK: - SceneKit delegate
@@ -257,42 +301,13 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         // TODO: this is what will be copied for checking the makeup after you're done
         /// every frame, check if we have successfully collected the images. If not, try to collect them
-        if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
-            if (faceImages[0] == nil) {
-                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "blank") {
-                    faceImages[0] = sceneView.snapshot()
-                    DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "HeadOn1")
-                    }
-                    print("head on image collected")
-                }
-                // TODO: check to make sure the snapshots are actually good
-            }
-            if (faceImages[1] == nil) {
-                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedLeft) {
-                    faceImages[1] = sceneView.snapshot()
-                    DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "RotatedLeft1")
-                    }
-                    print("rotated left image collected")
-                }
-            }
-            if (faceImages[2] == nil) {
-                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedRight) {
-                    faceImages[2] = sceneView.snapshot()
-                    DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "RotatedRight1")
-                    }
-                    print("rotated right image collected")
-                }
-            }
-            
+        if (!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) {
+            saveTextures1()
             
             // MARK: - Finish collecting images
             /// this runs once, right when the images just finished all getting collected
-            if (faceImages[0] != nil && faceImages[1] != nil && faceImages[2] != nil) {
+            if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2]) {
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
-                
                 
                 /// hide the instructional image
                 DispatchQueue.main.async {
@@ -305,8 +320,11 @@ extension ARSessionManager: ARSCNViewDelegate {
                 /// initialize and start timer 3
                 firetimer3()
             }
-        
         }
+        
+        
+        
+        
         facePosition = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         // variable to say if the face is not normal. if this variable changes, _____
         // doesn't go back to normal after 5 seconds
