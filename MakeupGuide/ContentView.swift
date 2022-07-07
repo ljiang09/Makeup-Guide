@@ -19,23 +19,24 @@ struct ContentView : View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
-            Button(action: {
-                arManager.saveTextures2()
-                
-                print("run code to get 3 more UV maps. then run code to compare the two")
-                // i think this needs to be in the form of changing an observed variable in the ar sessio nmanager? and when it is set to true then run code in the renderer()? idk
-            }, label: {
-                Text("Check your makeup")
-                    .padding(30)
-                    .font(.system(size: 30))
-                    .foregroundColor(.black)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-            })
-            .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+            
+            // TODO: hide this button when the second batch is currently in progress for being collected
+            if (arManager.isButtonShowing) {
+                Button(action: {
+                    arManager.setGeneratingFaceTextures2(setTo: true)
+                }, label: {
+                    Text("Check your makeup")
+                        .padding(30)
+                        .font(.system(size: 30))
+                        .foregroundColor(.black)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                })
+                .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+            }
             
             
-            if arManager.isNeckImageShowing {
+            if (arManager.isNeckImageShowing) {
                 Images().neckRotationImage
                     .resizable()
                     .frame(width: 200, height: 200)

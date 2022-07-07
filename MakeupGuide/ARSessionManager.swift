@@ -21,8 +21,11 @@ class ARSessionManager: NSObject, ObservableObject {
     
     static var shared: ARSessionManager = ARSessionManager()
     
+    @Published var isButtonShowing: Bool            // represents the button on the ContentView to get a second batch of images
     @Published var isNeckImageShowing: Bool
     @Published var isCheckImageShowing: Bool
+    @Published var generatingFaceTextures2: Bool        // indicates the user wants to generate the second set of textures
+    
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     var faceImagesCollected: [Bool] = [false, false, false, false, false, false]   /// 0-2 are for first set, 3-5 for last set
     
@@ -46,8 +49,10 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     private override init() {
+        isButtonShowing = false
         isNeckImageShowing = false
         isCheckImageShowing = false
+        generatingFaceTextures2 = false
         
         super.init()
         sceneView.session.run(ARFaceTrackingConfiguration())
@@ -178,27 +183,62 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// this is called to save the first batch of textures, right when the app is opened
     private func saveTextures1() {
-        print("saving textures 1...")
-        
         collectFaceImage(whichImage: 0, expectedImage: "blank", fileName: "HeadOn1")
         collectFaceImage(whichImage: 1, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft1")
         collectFaceImage(whichImage: 2, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight1")
-        
-        print("done saving textures 1!")
     }
     
-    /// this is called to save the second batch of textures, when the user clicks the button
-    public func saveTextures2() {
-        print("saving textures 2...")
+    /// this fxn is called once per button click
+    public func setGeneratingFaceTextures2(setTo: Bool) {
+        generatingFaceTextures2 = setTo
         
+        /// start repeating reminders to remind the user to rotate their head
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.isNeckImageShowing = true
+            SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+            self.firetimer2()
+        }
+        
+        
+        /// create a clean slate (as if the button had never been clicked before). reset the face images collected, delete the files that were written to the points
+        faceImagesCollected[3] = false
+        faceImagesCollected[4] = false
+        faceImagesCollected[5] = false
+        
+        if (headOnImgDirectory2 != nil) {
+            do {
+                try FileManager.default.removeItem(at: headOnImgDirectory2)
+                print("deleted Head On 2 image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
+        if (rotatedLeftImgDirectory2 != nil) {
+            do {
+                try FileManager.default.removeItem(at: rotatedLeftImgDirectory2)
+                print("deleted rotated left 2 image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
+        if (rotatedRightImgDirectory2 != nil) {
+            do {
+                try FileManager.default.removeItem(at: rotatedRightImgDirectory2)
+                print("deleted rotated right 2 image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
+    }
+    
+    /// this is called every frame to save the second batch of textures, when the user clicks the button
+    private func saveTextures2() {
         // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
         // TODO: check to make sure the snapshots are actually good
         
         collectFaceImage(whichImage: 3, expectedImage: "blank", fileName: "HeadOn2")
         collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
         collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
-        
-        print("done saving textures 2!")
     }
     
     
@@ -262,7 +302,7 @@ class ARSessionManager: NSObject, ObservableObject {
 
 
 
-// MARK: - SceneKit delegate
+// MARK: - Sceneview delegate
 extension ARSessionManager: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -299,25 +339,41 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
-        // TODO: this is what will be copied for checking the makeup after you're done
         /// every frame, check if we have successfully collected the images. If not, try to collect them
         if (!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) {
+            
             saveTextures1()
             
-            // MARK: - Finish collecting images
-            /// this runs once, right when the images just finished all getting collected
+            /// Finish collecting images. this runs once, right when the images just finished all getting collected
             if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2]) {
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
                 /// hide the instructional image
                 DispatchQueue.main.async {
                     self.isNeckImageShowing = false
+                    self.isButtonShowing = true
                 }
-                
-                /// stop timer 2
                 timer2.invalidate()
+                firetimer3()
+            }
+        }
+        
+        
+        /// for when the user clicks the button
+        if ((generatingFaceTextures2) && (!faceImagesCollected[3] || !faceImagesCollected[4] || !faceImagesCollected[5])) {
+            
+            saveTextures2()
+            
+            /// Finish collecting images. this runs once, right when the images just finished all getting collected
+            if (faceImagesCollected[3] && faceImagesCollected[4] && faceImagesCollected[5]) {
+                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
-                /// initialize and start timer 3
+                /// hide the instructional image
+                DispatchQueue.main.async {
+                    self.isNeckImageShowing = false
+                    self.generatingFaceTextures2 = false
+                }
+                timer2.invalidate()
                 firetimer3()
             }
         }
@@ -325,13 +381,13 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
-        facePosition = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
+        
+        
         // variable to say if the face is not normal. if this variable changes, _____
         // doesn't go back to normal after 5 seconds
         
+        facePosition = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         faceOrientation = CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
-        
-        
         
         
         /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
