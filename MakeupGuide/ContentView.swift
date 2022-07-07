@@ -43,7 +43,7 @@ struct ContentView : View {
                     }
             }
             
-            if self.showingCheckImage {
+            if ((self.showingCheckImage) || (arManager.isCheckImageShowing)) {
                 Images().checkMark
                     .resizable()
                     .frame(width: 200, height: 200)
@@ -53,9 +53,9 @@ struct ContentView : View {
         }
     }
     
-    private func showCheckImage() {
+    func showCheckImage() {
         self.showingCheckImage = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             self.showingCheckImage = false
         }
     }

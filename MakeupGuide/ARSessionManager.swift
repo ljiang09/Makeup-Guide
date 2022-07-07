@@ -22,6 +22,7 @@ class ARSessionManager: NSObject, ObservableObject {
     static var shared: ARSessionManager = ARSessionManager()
     
     @Published var isNeckImageShowing: Bool
+    @Published var isCheckImageShowing: Bool
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     var faceImages: [UIImage?] = [nil, nil, nil]
     
@@ -46,6 +47,7 @@ class ARSessionManager: NSObject, ObservableObject {
     
     private override init() {
         isNeckImageShowing = false
+        isCheckImageShowing = false
         
         super.init()
         sceneView.session.run(ARFaceTrackingConfiguration())
@@ -69,18 +71,20 @@ class ARSessionManager: NSObject, ObservableObject {
         /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.checkFaceUntilRepositioned(completion: {
-                print("completion is running")
-                // TODO: this runs regardless of whether the face is in the screen... make the completion so that it only runs when the face is found in the screen
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
-                // TODO: show the check mark image here
                 
+                self.isCheckImageShowing = true
                 /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.isNeckImageShowing = true
-                    SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+                    self.isCheckImageShowing = false
                     
-                    /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
-                    self.firetimer2()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        self.isNeckImageShowing = true
+                        SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+                        
+                        /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                        self.firetimer2()
+                    }
                 }
             })
         }
@@ -199,7 +203,7 @@ class ARSessionManager: NSObject, ObservableObject {
                     case "RotatedRight2":
                         rotatedRightImgDirectory2 = url; break;
                     default:
-                        print("specified filename for the texture image is not valid")
+                        print("specified filename for the texture image is not valid"); break;
                     }
                 } catch {
                     print("Unable to Write Image Data to Disk")
