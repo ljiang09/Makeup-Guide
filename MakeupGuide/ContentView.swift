@@ -20,8 +20,7 @@ struct ContentView : View {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
             
-            // TODO: hide this button when the second batch is currently in progress for being collected
-            if (arManager.isButtonShowing) {
+            if ((arManager.isButtonShowing) && (!arManager.generatingFaceTextures2)) {
                 Button(action: {
                     arManager.setGeneratingFaceTextures2(setTo: true)
                 }, label: {
