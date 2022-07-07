@@ -32,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if (arManager.headOnImgDirectory != nil) {
             do {
                 try FileManager.default.removeItem(at: arManager.headOnImgDirectory)
+                print("deleted head on image")
             } catch {
                 print("Could not clear temp folder: \(error)")
             }
@@ -39,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if (arManager.rotatedLeftImgDirectory != nil) {
             do {
                 try FileManager.default.removeItem(at: arManager.rotatedLeftImgDirectory)
+                print("deleted rotated left image")
             } catch {
                 print("Could not clear temp folder: \(error)")
             }
@@ -46,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if (arManager.rotatedRightImgDirectory != nil) {
             do {
                 try FileManager.default.removeItem(at: arManager.rotatedRightImgDirectory)
+                print("deleted rotated right image")
             } catch {
                 print("Could not clear temp folder: \(error)")
             }

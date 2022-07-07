@@ -51,33 +51,6 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
             viewportSize: UIScreen.main.bounds.size,
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
-        
-        // Preview
-        previewSceneView = SCNView(frame: CGRect(x: 0, y: 0, width: 200, height: 200), options: nil)
-        previewSceneView.rendersContinuously = true
-        previewSceneView.backgroundColor = UIColor.black
-        previewSceneView.allowsCameraControl = true
-        self.view.addSubview(previewSceneView)
-        previewSceneView.scene = SCNScene()
-        
-        let camera = SCNCamera()
-        camera.zNear = 0.001
-        camera.zFar = 1000
-        
-        let cameraNode = SCNNode()
-        cameraNode.camera = camera
-        cameraNode.position = SCNVector3Make(0, 0, 1)
-        previewSceneView.scene!.rootNode.addChildNode(cameraNode)
-        cameraNode.look(at: SCNVector3Zero)
-        
-        self.previewFaceGeometry = ARSCNFaceGeometry(device: self.sceneView.device!, fillMesh: true)
-        self.previewFaceNode = SCNNode(geometry: self.previewFaceGeometry)
-        let faceScale = Float(4.0)
-        self.previewFaceNode.scale = SCNVector3(x: faceScale, y: faceScale, z: faceScale)
-        self.previewFaceGeometry.firstMaterial!.diffuse.contents = faceUvGenerator.texture
-        self.previewFaceGeometry.firstMaterial!.isDoubleSided = true
-
-        previewSceneView.scene!.rootNode.addChildNode(self.previewFaceNode!)
     }
     
     override func viewDidAppear(_ animated: Bool) {

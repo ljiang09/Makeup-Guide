@@ -288,8 +288,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 /// initialize and start timer 2
                 firetimer3()
-                
-                // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
             }
         
         }
