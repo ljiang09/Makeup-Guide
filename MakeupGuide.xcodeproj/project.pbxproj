@@ -11,6 +11,7 @@
 		C44E80712866383C00550CE8 /* ARControllerTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80702866383C00550CE8 /* ARControllerTexture.swift */; };
 		C44E80732866386500550CE8 /* TextureToImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80722866386500550CE8 /* TextureToImage.swift */; };
 		C44E8075286641B500550CE8 /* faceTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = C44E8074286641B500550CE8 /* faceTexture.metal */; };
+		C475427428769E7800A5C948 /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C475427328769E7800A5C948 /* SuccessSound.wav */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
 		C4E50885285912A60020EF3D /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = C4E50884285912A60020EF3D /* Experience.rcproject */; };
@@ -24,7 +25,6 @@
 		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
 		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
 		C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F695912862206200C9E90A /* SoundHelpers.swift */; };
-		C4F695972862537400C9E90A /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C4F695962862537400C9E90A /* SuccessSound.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +49,7 @@
 		C44E80702866383C00550CE8 /* ARControllerTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARControllerTexture.swift; sourceTree = "<group>"; };
 		C44E80722866386500550CE8 /* TextureToImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureToImage.swift; sourceTree = "<group>"; };
 		C44E8074286641B500550CE8 /* faceTexture.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = faceTexture.metal; sourceTree = "<group>"; };
+		C475427328769E7800A5C948 /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SuccessSound.wav; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -65,7 +66,6 @@
 		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
 		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		C4F695912862206200C9E90A /* SoundHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundHelpers.swift; sourceTree = "<group>"; };
-		C4F695962862537400C9E90A /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = SuccessSound.wav; path = ../../../../Downloads/SuccessSound.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,7 +179,7 @@
 		C4F695932862353200C9E90A /* AudioFiles */ = {
 			isa = PBXGroup;
 			children = (
-				C4F695962862537400C9E90A /* SuccessSound.wav */,
+				C475427328769E7800A5C948 /* SuccessSound.wav */,
 			);
 			path = AudioFiles;
 			sourceTree = "<group>";
@@ -289,7 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4E5088A285912AA0020EF3D /* Preview Assets.xcassets in Resources */,
-				C4F695972862537400C9E90A /* SuccessSound.wav in Resources */,
+				C475427428769E7800A5C948 /* SuccessSound.wav in Resources */,
 				C4E50887285912AA0020EF3D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
