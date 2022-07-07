@@ -9,8 +9,14 @@ This file manages the AR session and triggers commands such as informing the use
 import SwiftUI
 import SceneKit
 import ARKit
+import UIKit
 
 class ARSessionManager: NSObject, ObservableObject {
+    // variables for the UV unwrapping
+    private var faceUvGenerator: FaceTextureGenerator!
+    private var scnFaceGeometry: ARSCNFaceGeometry!
+    private let faceTextureSize = 1024 //px
+    
     let sceneView = ARSCNView(frame: .zero)
     
     static var shared: ARSessionManager = ARSessionManager()
@@ -26,12 +32,31 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
+    
+    
+    var headOnImgDirectory: URL!
+    var rotatedLeftImgDirectory: URL!
+    var rotatedRightImgDirectory: URL!
+    
+    
     private override init() {
         isNeckImageShowing = false
         
         super.init()
         sceneView.session.run(ARFaceTrackingConfiguration())
         sceneView.delegate = self
+        
+        
+        // TODO: test whether having fill mesh true/false is more accurate
+        self.scnFaceGeometry = ARSCNFaceGeometry(device: self.sceneView.device!, fillMesh: true)
+        
+        self.faceUvGenerator = FaceTextureGenerator(
+            device: self.sceneView.device!,
+            library: self.sceneView.device!.makeDefaultLibrary()!,      // this compiles all metal files into one library
+            viewportSize: UIScreen.main.bounds.size,
+            face: self.scnFaceGeometry,
+            textureSize: faceTextureSize)
+        
         
         
         /// after half a second, call function to check whether the user's face is positioned well in the screen.
@@ -140,6 +165,41 @@ class ARSessionManager: NSObject, ObservableObject {
             SoundHelper.shared.announce(announcement: faceOrientation)
         }
     }
+    
+    
+    // MARK: Export to documents folder with name `fileName`
+    /// fileName is the name you want to reference the file with, and the name to which it is saved on the UserDefaults
+    public func exportTextureMap(fileName: String) {
+        if let uiImage = textureToImage(faceUvGenerator.texture) {
+            
+            // access documents directory
+            let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let url: URL = documents.appendingPathComponent(fileName)
+            
+            // save the image in the documents directory
+            if let data = uiImage.pngData() {
+                do {
+                    try data.write(to: url)
+                    switch (fileName) {
+                    case "HeadOn":
+                        headOnImgDirectory = url; break;
+                    case "RotatedLeft":
+                        rotatedLeftImgDirectory = url; break;
+                    case "RotatedRight":
+                        rotatedRightImgDirectory = url; break;
+                    default:
+                        print("specified filename for the texture image is not valid")
+                    }
+                } catch {
+                    print("Unable to Write Image Data to Disk")
+                }
+            }
+            
+        } else {
+            print("export failed")
+        }
+    }
+    
 }
 
 
@@ -147,18 +207,13 @@ class ARSessionManager: NSObject, ObservableObject {
 extension ARSessionManager: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        /// Make sure the device supports Metal
-        guard let device = sceneView.device else { return nil }
-
-        /// Create the face geometry
-        let faceGeometry = ARSCNFaceGeometry(device: device)
-
-        /// Create a SceneKit node to be rendered
-        let node = SCNNode(geometry: faceGeometry)
-
-        /// Set the fill mode for the node to be lines. This makes the mesh mask
-        node.geometry?.firstMaterial?.fillMode = .lines
-
+        /// replaced the old code that made a mesh on your face, with the code that was in the HeadShot renderer()
+        guard anchor is ARFaceAnchor else {
+            return nil
+        }
+        /// this is for the face UV unwrapping. Unsure if its needed
+        let node = SCNNode(geometry: scnFaceGeometry)
+        scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)   // this line of code works with other images, not sure about this MTLTexture tho. Perhaps need to convert it to Image - test this current code out!!
         return node
     }
     
@@ -168,6 +223,7 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         /// check to make sure the face anchor and geometry being updated are the correct types (`ARFaceAnchor` and `ARSCNFaceGeometry`)
         guard let faceAnchor = anchor as? ARFaceAnchor,
+              let frame = sceneView.session.currentFrame,
               let faceGeometry = node.geometry as? ARSCNFaceGeometry else { return }
         
         /// Update `ARSCNFaceGeometry` using the `ARFaceGeometry` corresponding to the `ARFaceAnchor`
@@ -189,6 +245,9 @@ extension ARSessionManager: ARSCNViewDelegate {
             if (faceImages[0] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
                     faceImages[0] = sceneView.snapshot()
+                    DispatchQueue.main.async {
+                        self.exportTextureMap(fileName: "HeadOn")
+                    }
                     print("head on image collected")
                 }
                 // TODO: check to make sure the snapshots are actually good
@@ -196,12 +255,18 @@ extension ARSessionManager: ARSCNViewDelegate {
             if (faceImages[1] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedLeft) {
                     faceImages[1] = sceneView.snapshot()
+                    DispatchQueue.main.async {
+                        self.exportTextureMap(fileName: "RotatedLeft")
+                    }
                     print("rotated left image collected")
                 }
             }
             if (faceImages[2] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedRight) {
                     faceImages[2] = sceneView.snapshot()
+                    DispatchQueue.main.async {
+                        self.exportTextureMap(fileName: "RotatedRight")
+                    }
                     print("rotated right image collected")
                 }
             }
@@ -223,8 +288,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 /// initialize and start timer 2
                 firetimer3()
-                
-                // TODO: convert the images to 2D and store locally? make a function to when the ar session ends, the images get deleted and eveyrhting resets?
             }
         
         }
@@ -234,6 +297,12 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         faceOrientation = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         
+        
+        
+        
+        /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
+        scnFaceGeometry.update(from: faceAnchor.geometry)
+        faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
     }
     
 }

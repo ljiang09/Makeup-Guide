@@ -11,6 +11,7 @@ import SwiftUI
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    @ObservedObject var arManager = ARSessionManager.shared
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -24,6 +25,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = window
         window.makeKeyAndVisible()
         return true
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        // delete the face texture images that were used during the session
+        if (arManager.headOnImgDirectory != nil) {
+            do {
+                try FileManager.default.removeItem(at: arManager.headOnImgDirectory)
+                print("deleted head on image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
+        if (arManager.rotatedLeftImgDirectory != nil) {
+            do {
+                try FileManager.default.removeItem(at: arManager.rotatedLeftImgDirectory)
+                print("deleted rotated left image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
+        if (arManager.rotatedRightImgDirectory != nil) {
+            do {
+                try FileManager.default.removeItem(at: arManager.rotatedRightImgDirectory)
+                print("deleted rotated right image")
+            } catch {
+                print("Could not clear temp folder: \(error)")
+            }
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

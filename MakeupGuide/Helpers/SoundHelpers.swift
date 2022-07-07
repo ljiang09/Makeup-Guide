@@ -137,7 +137,7 @@ class SoundHelper: NSObject {
                 currentAnnouncement = announcement
                 synthesizer.speak(utterance)
             } catch {
-                print("Unexpeced error announcing something using AVSpeechEngine!")
+                print("Unexpteced error announcing something using AVSpeechEngine!")
             }
         }
     }
