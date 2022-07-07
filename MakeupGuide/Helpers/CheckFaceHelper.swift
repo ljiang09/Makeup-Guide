@@ -53,6 +53,8 @@ class CheckFaceHelper {
             // [2][2] 1 -> 0.83
             return tiltedBackward
         }
+        // TODO: make an if statement to figure out if the face is in the screen at all, if it is head on. BC right now, headOn and not in screen are the saem, represented by "blank"
+        
 
         /// I commented all these out because I don't think tilt left/right matters
         /// note (6/13/2022): I changed the transform matrix to be in the camera's coordinates so some of these values may be outdated
@@ -73,7 +75,7 @@ class CheckFaceHelper {
             return "Tilted Right"
         }*/
         
-        return ""
+        return "blank"
     }
 
 
@@ -100,8 +102,11 @@ class CheckFaceHelper {
         if (transformMatrix[3][0] > thresholds[0]*0.75) {
             return "Face is too far down"
         }
+        if ((thresholds[1]*0.75...thresholds[0]*0.75 ~= transformMatrix[3][0]) && (thresholds[3]*0.75...thresholds[2]*0.75 ~= transformMatrix[3][1])) {
+            return "Face is centered"
+        }
         
-        return ""
+        return "blank"  // note that this is only useful at the very beginning before teh value has been populated. because it will never become populated iwth "blank" again
     }
     
     

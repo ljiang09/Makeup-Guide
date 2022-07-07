@@ -34,9 +34,14 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     
-    var headOnImgDirectory: URL!
-    var rotatedLeftImgDirectory: URL!
-    var rotatedRightImgDirectory: URL!
+    /// for the first set of UV textures, when the app first opens
+    var headOnImgDirectory1: URL!
+    var rotatedLeftImgDirectory1: URL!
+    var rotatedRightImgDirectory1: URL!
+    /// for the second set of UV textures, when the user clicks the "check makeup" button
+    var headOnImgDirectory2: URL!
+    var rotatedLeftImgDirectory2: URL!
+    var rotatedRightImgDirectory2: URL!
     
     
     private override init() {
@@ -64,6 +69,8 @@ class ARSessionManager: NSObject, ObservableObject {
         /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.checkFaceUntilRepositioned(completion: {
+                print("completion is running")
+                // TODO: this runs regardless of whether the face is in the screen... make the completion so that it only runs when the face is found in the screen
                 SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
                 // TODO: show the check mark image here
                 
@@ -80,30 +87,29 @@ class ARSessionManager: NSObject, ObservableObject {
         
     }
     
-    // TODO: have a on end function to pause the ar session and invalidate the timer?
-    
-    
     /// this function is intended to run at the beginning of the app lifecycle
     /// it is also optionally called whenever the user's face is continually not centered
     ///
     /// it continually checks the face position until the face is centered and then runs the closure
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
+        print("Timer 1 fired!")
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
-            if ((self.facePosition == "") && (self.faceOrientation == "")) {
+            if (self.facePosition == "Face is centered") {
                 timer1.invalidate()
                 completion()
             }
             
-            if ((self.facePosition != "") || (self.facePosition != "blank")) {
+            if (self.facePosition != "blank") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                     SoundHelper.shared.announce(announcement: self.facePosition)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         SoundHelper.shared.announce(announcement: self.faceOrientation)
                     }
                 }
-            } else {
+            }
+            else {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    SoundHelper.shared.announce(announcement: self.faceOrientation)
+                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
                 }
             }
         })
@@ -113,25 +119,26 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     
+    /// this is fired when the user first correctly positions themself in the screen. every 8 seconds it reminds the user to rotate their head
     func firetimer2() {
         timer2 = Timer(fire: Date(), interval: 8.0, repeats: true, block: { _ in
             self.ontimer2Reset()
         })
         timer2.tolerance = 0.4
-        /// start the timer
+        
         RunLoop.current.add(timer2, forMode: .default)
-        print("Timer 1 fired!")
+        print("Timer 2 fired!")
     }
     
+    /// this is fired after the initial 3 UV images are collected.
     func firetimer3() {
-        /// initialize timer
         timer3 = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
             self.ontimer3Reset()
         })
         timer3.tolerance = 0.1
-        /// start the timer
+        
         RunLoop.current.add(timer3, forMode: .default)
-        print("Timer 2 fired!")
+        print("Timer 3 fired!")
     }
     
     func ontimer2Reset() {
@@ -139,8 +146,8 @@ class ARSessionManager: NSObject, ObservableObject {
         /// remind the user to position their head in the screen
         SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
         
-        /// state where the user's face is and orientation
-        if facePosition != "" {
+        /// state user face and orientation if the face is in the screen
+        if (facePosition != "blank") {
             // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 SoundHelper.shared.announce(announcement: self.facePosition)
@@ -150,18 +157,16 @@ class ARSessionManager: NSObject, ObservableObject {
             }
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                SoundHelper.shared.announce(announcement: self.faceOrientation)
+                SoundHelper.shared.announce(announcement: "please position your face in the screen")
             }
         }
     }
     
     func ontimer3Reset() {
-        /// check the face orientation and speak when necessary
-        if facePosition != "" {
+        /// check the face orientation and speak face is rotated and such
+        if facePosition != "blank" {
             SoundHelper.shared.announce(announcement: facePosition)
-        }
-        
-        if faceOrientation != "" {
+        } else if faceOrientation != "blank" {
             SoundHelper.shared.announce(announcement: faceOrientation)
         }
     }
@@ -181,12 +186,18 @@ class ARSessionManager: NSObject, ObservableObject {
                 do {
                     try data.write(to: url)
                     switch (fileName) {
-                    case "HeadOn":
-                        headOnImgDirectory = url; break;
-                    case "RotatedLeft":
-                        rotatedLeftImgDirectory = url; break;
-                    case "RotatedRight":
-                        rotatedRightImgDirectory = url; break;
+                    case "HeadOn1":
+                        headOnImgDirectory1 = url; break;
+                    case "RotatedLeft1":
+                        rotatedLeftImgDirectory1 = url; break;
+                    case "RotatedRight1":
+                        rotatedRightImgDirectory1 = url; break;
+                    case "HeadOn2":
+                        headOnImgDirectory2 = url; break;
+                    case "RotatedLeft2":
+                        rotatedLeftImgDirectory2 = url; break;
+                    case "RotatedRight2":
+                        rotatedRightImgDirectory2 = url; break;
                     default:
                         print("specified filename for the texture image is not valid")
                     }
@@ -240,13 +251,14 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
+        // TODO: this is what will be copied for checking the makeup after you're done
         /// every frame, check if we have successfully collected the images. If not, try to collect them
         if (faceImages[0] == nil || faceImages[1] == nil || faceImages[2] == nil) {
             if (faceImages[0] == nil) {
-                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
+                if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "blank") {
                     faceImages[0] = sceneView.snapshot()
                     DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "HeadOn")
+                        self.exportTextureMap(fileName: "HeadOn1")
                     }
                     print("head on image collected")
                 }
@@ -256,7 +268,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedLeft) {
                     faceImages[1] = sceneView.snapshot()
                     DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "RotatedLeft")
+                        self.exportTextureMap(fileName: "RotatedLeft1")
                     }
                     print("rotated left image collected")
                 }
@@ -265,7 +277,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedRight) {
                     faceImages[2] = sceneView.snapshot()
                     DispatchQueue.main.async {
-                        self.exportTextureMap(fileName: "RotatedRight")
+                        self.exportTextureMap(fileName: "RotatedRight1")
                     }
                     print("rotated right image collected")
                 }
@@ -283,19 +295,19 @@ extension ARSessionManager: ARSCNViewDelegate {
                     self.isNeckImageShowing = false
                 }
                 
-                /// stop timer 1
+                /// stop timer 2
                 timer2.invalidate()
                 
-                /// initialize and start timer 2
+                /// initialize and start timer 3
                 firetimer3()
             }
         
         }
-        facePosition = CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
+        facePosition = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         // variable to say if the face is not normal. if this variable changes, _____
         // doesn't go back to normal after 5 seconds
         
-        faceOrientation = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
+        faceOrientation = CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
         
         
         

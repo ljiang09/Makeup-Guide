@@ -12,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     @ObservedObject var arManager = ARSessionManager.shared
-
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
@@ -29,28 +29,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         // delete the face texture images that were used during the session
-        if (arManager.headOnImgDirectory != nil) {
-            do {
-                try FileManager.default.removeItem(at: arManager.headOnImgDirectory)
-                print("deleted head on image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
-        if (arManager.rotatedLeftImgDirectory != nil) {
-            do {
-                try FileManager.default.removeItem(at: arManager.rotatedLeftImgDirectory)
-                print("deleted rotated left image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
-        if (arManager.rotatedRightImgDirectory != nil) {
-            do {
-                try FileManager.default.removeItem(at: arManager.rotatedRightImgDirectory)
-                print("deleted rotated right image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
+        let possibleDirectories = [arManager.headOnImgDirectory1,
+                                   arManager.rotatedLeftImgDirectory1,
+                                   arManager.rotatedRightImgDirectory1,
+                                   arManager.headOnImgDirectory2,
+                                   arManager.rotatedLeftImgDirectory2,
+                                   arManager.rotatedRightImgDirectory2]
+        possibleDirectories.forEach { value in
+            if (value != nil) {
+                do {
+                    try FileManager.default.removeItem(at: value!)
+                    print("deleted image from Documents directory")
+                } catch {
+                    print("Could not clear temp folder: \(error)")
+                }
             }
         }
     }

@@ -16,11 +16,24 @@ struct ContentView : View {
     @State private var showingCheckImage = false
     
     var body: some View {
-        return ZStack {
+        return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
+            Button(action: {
+                print("run code to get 3 more UV maps. then run code to compare the two")
+                // i think this needs to be in the form of changing an observed variable in the ar sessio nmanager? and when it is set to true then run code in the renderer()? idk
+            }, label: {
+                Text("Check your makeup")
+                    .padding(30)
+                    .font(.system(size: 30))
+                    .foregroundColor(.black)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            })
+            .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+            
+            
             if arManager.isNeckImageShowing {
-                // TODO: voice telling them to position their head in the screen and move it side to side
                 Images().neckRotationImage
                     .resizable()
                     .frame(width: 200, height: 200)
@@ -36,6 +49,7 @@ struct ContentView : View {
                     .frame(width: 200, height: 200)
                     .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
             }
+            
         }
     }
     
