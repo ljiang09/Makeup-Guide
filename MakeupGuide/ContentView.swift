@@ -19,6 +19,20 @@ struct ContentView : View {
         return ZStack {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
+            
+            // this is purely for debugging!!!!!
+//            if arManager.rotatedLeftImgDirectory != nil {
+//                if let image = loadImageFromDiskWith(fileName: "RotatedLeft") {
+//                    Image(uiImage: image)
+//                        .resizable()
+//                        .frame(width: 400, height: 400)
+//                }
+//
+//                // TODO: show the image! from the user defaults
+//
+//                Text("head on image is saved. this will be replaced by that image in another iteration")
+//            }
+            
             if arManager.isNeckImageShowing {
                 // TODO: voice telling them to position their head in the screen and move it side to side
                 Images().neckRotationImage
@@ -45,6 +59,24 @@ struct ContentView : View {
             self.showingCheckImage = false
         }
     }
+    
+    private func loadImageFromDiskWith(fileName: String) -> UIImage? {
+      let documentDirectory = FileManager.SearchPathDirectory.documentDirectory
+
+        let userDomainMask = FileManager.SearchPathDomainMask.userDomainMask
+        let paths = NSSearchPathForDirectoriesInDomains(documentDirectory, userDomainMask, true)
+
+        if let dirPath = paths.first {
+            let imageUrl = URL(fileURLWithPath: dirPath).appendingPathComponent(fileName)
+            let image = UIImage(contentsOfFile: imageUrl.path)
+            return image
+
+        }
+
+        return nil
+    }
+
+
 }
 
 

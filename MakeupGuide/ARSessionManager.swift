@@ -32,6 +32,13 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
+    
+    
+    var headOnImgDirectory: URL!
+    var rotatedLeftImgDirectory: URL!
+    var rotatedRightImgDirectory: URL!
+    
+    
     private override init() {
         isNeckImageShowing = false
         
@@ -160,11 +167,34 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     
-    /// just for debugging purposes
-    public func exportTextureMapToPhotos() {
+    // MARK: Export to documents folder with name `fileName`
+    /// fileName is the name you want to reference the file with, and the name to which it is saved on the UserDefaults
+    public func exportTextureMap(fileName: String) {
         if let uiImage = textureToImage(faceUvGenerator.texture) {
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
-            print("export saved to photos")
+            
+            // access documents directory
+            let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let url: URL = documents.appendingPathComponent(fileName)
+            
+            // save the image in the documents directory
+            if let data = uiImage.pngData() {
+                do {
+                    try data.write(to: url)
+                    switch (fileName) {
+                    case "HeadOn":
+                        headOnImgDirectory = url; break;
+                    case "RotatedLeft":
+                        rotatedLeftImgDirectory = url; break;
+                    case "RotatedRight":
+                        rotatedRightImgDirectory = url; break;
+                    default:
+                        print("specified filename for the texture image is not valid")
+                    }
+                } catch {
+                    print("Unable to Write Image Data to Disk")
+                }
+            }
+            
         } else {
             print("export failed")
         }
@@ -177,21 +207,6 @@ class ARSessionManager: NSObject, ObservableObject {
 extension ARSessionManager: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        /// Make sure the device supports Metal
-//        guard let device = sceneView.device else { return nil }
-
-        /// Create the face geometry
-//        let faceGeometry = ARSCNFaceGeometry(device: device)
-
-        /// Create a SceneKit node to be rendered
-//        let node = SCNNode(geometry: faceGeometry)
-
-        /// Set the fill mode for the node to be lines. This makes the mesh mask
-//        node.geometry?.firstMaterial?.fillMode = .lines
-        
-//        return node
-        
-        
         /// replaced the old code that made a mesh on your face, with the code that was in the HeadShot renderer()
         guard anchor is ARFaceAnchor else {
             return nil
@@ -231,7 +246,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == "") {
                     faceImages[0] = sceneView.snapshot()
                     DispatchQueue.main.async {
-                        self.exportTextureMapToPhotos()
+                        self.exportTextureMap(fileName: "HeadOn")
                     }
                     print("head on image collected")
                 }
@@ -240,12 +255,18 @@ extension ARSessionManager: ARSCNViewDelegate {
             if (faceImages[1] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedLeft) {
                     faceImages[1] = sceneView.snapshot()
+                    DispatchQueue.main.async {
+                        self.exportTextureMap(fileName: "RotatedLeft")
+                    }
                     print("rotated left image collected")
                 }
             }
             if (faceImages[2] == nil) {
                 if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == CheckFaceHelper.shared.rotatedRight) {
                     faceImages[2] = sceneView.snapshot()
+                    DispatchQueue.main.async {
+                        self.exportTextureMap(fileName: "RotatedRight")
+                    }
                     print("rotated right image collected")
                 }
             }
