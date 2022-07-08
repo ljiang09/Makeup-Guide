@@ -247,7 +247,9 @@ class ARSessionManager: NSObject, ObservableObject {
         if (!faceImagesCollected[whichImage]) {
             if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == expectedImage) {
                 faceImagesCollected[whichImage] = true
-                DispatchQueue.main.async {
+                
+                /// need to have a slight delay so the very first image collected isn't blank. Allow a few frames to go through first
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                     self.exportTextureMap(fileName: fileName)
                 }
             }
@@ -258,14 +260,19 @@ class ARSessionManager: NSObject, ObservableObject {
     // MARK: Export to documents folder with name `fileName`
     /// fileName is the name you want to reference the file with, and the name to which it is saved on the UserDefaults
     private func exportTextureMap(fileName: String) {
-        if let uiImage = textureToImage(faceUvGenerator.texture) {
+        if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
+            
+            // this is to debug - make sure the image being saved to documents and to firebase is the right image!! and not a random blank image
+            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+            print("saved to photos album")
             
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             let url: URL = documents.appendingPathComponent(fileName)
             
             // save the image in the documents directory
-            if let data = uiImage.pngData() {
+            if let data: Data = uiImage.jpegData(compressionQuality: 0.8) {
+                // TODO: mess with the compression quality to see if ti affects it a ton. find the sweet spot
                 do {
                     try data.write(to: url)
                     switch (fileName) {
