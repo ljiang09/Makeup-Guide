@@ -236,7 +236,7 @@ class ARSessionManager: NSObject, ObservableObject {
         // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
         // TODO: check to make sure the snapshots are actually good
         
-        collectFaceImage(whichImage: 3, expectedImage: "blank", fileName: "HeadOn2")
+        collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn2")
         collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
         collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
     }

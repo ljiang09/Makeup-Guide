@@ -14,7 +14,7 @@ class CheckFaceHelper {
     let rotatedRight = "Face is rotated right"
     let tiltedForward = "Face is tilted forward"
     let tiltedBackward = "Face is tilted backward"
-    
+    let headOn = "Face is head on"
     
     func checkOrientationOfFace(transformMatrix: [[Float]]) -> String {
         /// thresholds for the `if` statements
@@ -22,23 +22,28 @@ class CheckFaceHelper {
         let th2: Float = 0.3
         let th3: Float = 0.5
         
-        if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] > th2)
-            && (transformMatrix[2][1] < -th2) && (transformMatrix[2][2] < th1)) {
-            return rotatedLeft
+        if (transformMatrix[2][2] < th1) {
+            if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] > th2)
+                && (transformMatrix[2][1] < -th2)) {
+                return rotatedLeft
+            }
+            if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] < -th2)
+                && (transformMatrix[2][1] > th2)) {
+                return rotatedRight
+            }
+            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th3)
+                && (transformMatrix[2][0] > th3)) {
+                return tiltedForward
+            }
+            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -0.5)
+                && (transformMatrix[2][0] < -0.5)) {
+                return tiltedBackward
+            }
+            // TODO: debug this - see if it prints out head on when it's supposed to. also change the AR manager code so that it distinguishes between `blank` and `head on`??
+            if ((transformMatrix[0][1] < th1) && (-th2...th2 ~= transformMatrix[0][2]) && (-th2...th2 ~= transformMatrix[2][1]) && (transformMatrix[1][0] > -th1) && (-0.5...th3 ~= transformMatrix[1][2]) && (-0.5...th3 ~= transformMatrix[2][0])) {
+                return headOn
+            }
         }
-        if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] < -th2)
-            && (transformMatrix[2][1] > th2) && (transformMatrix[2][2] < th1)) {
-            return rotatedRight
-        }
-        if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th3)
-            && (transformMatrix[2][0] > th3) && (transformMatrix[2][2] < th1)) {
-            return tiltedForward
-        }
-        if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -0.5) && (transformMatrix[2][0] < -0.5) && (transformMatrix[2][2] < th1)) {
-            return tiltedBackward
-        }
-        
-        // TODO: make an if statement to figure out if the face is in the screen at all, if it is head on. BC right now, headOn and not in screen are the saem, represented by "blank"
         
         return "blank"
     }
