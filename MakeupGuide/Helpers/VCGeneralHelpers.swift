@@ -12,6 +12,10 @@ import ARKit
 import SwiftUI
 import SceneKit
 
+class GeneralHelpers: ObservableObject {
+    static var shared: GeneralHelpers = GeneralHelpers()
+    let userDefaults = UserDefaults.standard
+}
 
 /// change world coordinates to the coordinates of the camera
 /// https://developer.apple.com/forums/thread/131982

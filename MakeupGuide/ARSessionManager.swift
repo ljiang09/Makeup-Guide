@@ -263,8 +263,8 @@ class ARSessionManager: NSObject, ObservableObject {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
             // this is to debug - make sure the image being saved to documents and to firebase is the right image!! and not a random blank image
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
-            print("saved to photos album")
+//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+//            print("saved to photos album")
             
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -294,8 +294,10 @@ class ARSessionManager: NSObject, ObservableObject {
                 } catch {
                     print("Unable to Write Image Data to Disk")
                 }
+                
+                /// send the image to Firebase to be stored
+                FirebaseHelpers.upload(imageData: data, fileName: fileName)
             }
-            
         } else {
             print("export failed")
         }

@@ -6,14 +6,17 @@ Created by Lily Jiang on 6/14/22
 
 import UIKit
 import SwiftUI
+import FirebaseCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     @ObservedObject var arManager = ARSessionManager.shared
+    @ObservedObject var generalHelpers = GeneralHelpers.shared
     
 
+    /// runs when the app session starts
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         // Create the SwiftUI view that provides the window contents.
@@ -24,9 +27,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = UIHostingController(rootView: contentView)
         self.window = window
         window.makeKeyAndVisible()
+        
+        FirebaseApp.configure()
+        
+        /// at the start of the app session, set/reset the SessionID to be used in posting images to firebase
+        generalHelpers.userDefaults.set(UUID().uuidString, forKey: "SessionID")
+        
         return true
     }
     
+    /// runs when the app session ends
     func applicationWillTerminate(_ application: UIApplication) {
         // delete the face texture images that were used during the session
         let possibleDirectories = [arManager.headOnImgDirectory1,

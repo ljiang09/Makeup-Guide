@@ -12,6 +12,8 @@ import ARKit
 
 // is there a way to call the shared instance of the manager, inside the manager class? 
 struct ContentView : View {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     @ObservedObject var arManager = ARSessionManager.shared
     @State private var showingCheckImage = false
     
