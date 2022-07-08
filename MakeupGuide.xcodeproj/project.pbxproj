@@ -26,7 +26,6 @@
 		C4E5089E285912AA0020EF3D /* MakeupGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */; };
 		C4E508A0285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */; };
 		C4E508AD28591FB50020EF3D /* VCGeneralHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AC28591FB50020EF3D /* VCGeneralHelpers.swift */; };
-		C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */; };
 		C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */; };
 		C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E508B32859218D0020EF3D /* ARSessionManager.swift */; };
 		C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F695912862206200C9E90A /* SoundHelpers.swift */; };
@@ -69,7 +68,6 @@
 		C4E5089D285912AA0020EF3D /* MakeupGuideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITests.swift; sourceTree = "<group>"; };
 		C4E5089F285912AA0020EF3D /* MakeupGuideUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupGuideUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		C4E508AC28591FB50020EF3D /* VCGeneralHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCGeneralHelpers.swift; sourceTree = "<group>"; };
-		C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetFaceBaseline.swift; sourceTree = "<group>"; };
 		C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckFaceHelper.swift; sourceTree = "<group>"; };
 		C4E508B32859218D0020EF3D /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		C4F695912862206200C9E90A /* SoundHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundHelpers.swift; sourceTree = "<group>"; };
@@ -181,7 +179,6 @@
 			children = (
 				C4E508AC28591FB50020EF3D /* VCGeneralHelpers.swift */,
 				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
-				C4E508AF285920BC0020EF3D /* GetFaceBaseline.swift */,
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 				C435EB482878B7AB007BA89B /* FirebaseHelpers.swift */,
 			);
@@ -348,7 +345,6 @@
 				C4E508AD28591FB50020EF3D /* VCGeneralHelpers.swift in Sources */,
 				C44E80732866386500550CE8 /* TextureToImage.swift in Sources */,
 				C44E8075286641B500550CE8 /* faceTexture.metal in Sources */,
-				C4E508B0285920BC0020EF3D /* GetFaceBaseline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

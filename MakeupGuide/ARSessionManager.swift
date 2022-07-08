@@ -262,10 +262,6 @@ class ARSessionManager: NSObject, ObservableObject {
     private func exportTextureMap(fileName: String) {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
-            // this is to debug - make sure the image being saved to documents and to firebase is the right image!! and not a random blank image
-//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
-//            print("saved to photos album")
-            
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             let url: URL = documents.appendingPathComponent(fileName)
@@ -338,7 +334,7 @@ extension ARSessionManager: ARSCNViewDelegate {
         faceGeometry.update(from: faceAnchor.geometry)
         
         /// change the coordinate system to be the camera (mathematically)
-        let x = changeCoordinates(currentFaceTransform: faceAnchor.transform, frame: sceneView.session.currentFrame!)
+        let x = GeneralHelpers.changeCoordinates(currentFaceTransform: faceAnchor.transform, frame: sceneView.session.currentFrame!)
         faceAnchorTransform = [[x[0][0], x[0][1], x[0][2], x[0][3]],     // column 0
                                [x[1][0], x[1][1], x[1][2], x[1][3]],
                                [x[2][0], x[2][1], x[2][2], x[2][3]],

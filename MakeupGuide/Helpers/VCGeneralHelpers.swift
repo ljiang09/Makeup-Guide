@@ -12,30 +12,38 @@ import ARKit
 import SwiftUI
 import SceneKit
 
+
 class GeneralHelpers: ObservableObject {
     static var shared: GeneralHelpers = GeneralHelpers()
     let userDefaults = UserDefaults.standard
-}
+    
+    
+    /// changes the face transform from world coordinates to the camera's coordinates (https://developer.apple.com/forums/thread/131982)
+    ///
+    /// - Parameters:
+    ///     - currentFaceTransform: the original face transform matrix (a 4x4 float matrix)
+    ///     - frame: represents the current frame of the AR session
+    ///
+    /// - Returns:
+    ///     - a 4x4 transform matrix representing the camera's coordinates.
+    ///         - +x points down, +y points right, +z points into the screen
+    public static func changeCoordinates(currentFaceTransform: simd_float4x4, frame: ARFrame) -> simd_float4x4 {
+        let currentCameraTransform = frame.camera.transform
 
-/// change world coordinates to the coordinates of the camera
-/// https://developer.apple.com/forums/thread/131982
-/// Note that the new system has the x and y rotated 90 degrees CW.
-func changeCoordinates(currentFaceTransform: simd_float4x4, frame: ARFrame) -> simd_float4x4 {
-    let currentCameraTransform = frame.camera.transform
+        let newFaceMatrix = SCNMatrix4.init(currentFaceTransform)
 
-    let newFaceMatrix = SCNMatrix4.init(currentFaceTransform)
+        let newCameraMatrix = SCNMatrix4.init(currentCameraTransform)
+        let cameraNode = SCNNode()
+        cameraNode.transform = newCameraMatrix
 
-    let newCameraMatrix = SCNMatrix4.init(currentCameraTransform)
-    let cameraNode = SCNNode()
-    cameraNode.transform = newCameraMatrix
+        let originNode = SCNNode()
+        originNode.transform = SCNMatrix4Identity
 
-    let originNode = SCNNode()
-    originNode.transform = SCNMatrix4Identity
+        /// Converts a transform from the node’s local coordinate space to that of another node.
+        let transformInCameraSpace = originNode.convertTransform(newFaceMatrix, to: cameraNode)
 
-    /// Converts a transform from the node’s local coordinate space to that of another node.
-    let transformInCameraSpace = originNode.convertTransform(newFaceMatrix, to: cameraNode)
-
-    return simd_float4x4(transformInCameraSpace)
+        return simd_float4x4(transformInCameraSpace)
+    }
 }
 
 

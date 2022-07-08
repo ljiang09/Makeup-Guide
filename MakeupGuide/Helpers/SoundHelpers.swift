@@ -15,12 +15,6 @@ import UIKit
 
 
 
-
-
-
-//import AVFoundation
-
-
 class SoundHelper: NSObject {
     static var shared: SoundHelper = SoundHelper()
     let synthesizer = AVSpeechSynthesizer()     /// this should only be created once because it is memory intensive
