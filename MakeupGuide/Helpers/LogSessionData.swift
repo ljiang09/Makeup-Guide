@@ -46,7 +46,13 @@ class LogSessionData: ObservableObject {
         buttonsClicked.append((Date().timeIntervalSince1970, whichButton))
     }
     
+    /// for when the image is collected (mainly looking at timestamps and order of collection here)
     func log(image: String) {
         imageCollection.append((Date().timeIntervalSince1970, image))
     }
+    
+//    func compileToJSON() -> [String: [String: Double]] {
+//        ["faceGeometries": sessionData.faceGeometries.map({ faceGeometry in ["timestamp": faceGeometry.0, "vertices": faceGeometry.1.vertices.map({ vertex in [vertex.x, vertex.y, vertex.z ]})] } ) ]
+//        // compile all the data into a dictionaty. return that
+//    }
 }

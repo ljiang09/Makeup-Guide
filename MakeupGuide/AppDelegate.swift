@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let contentView = ContentView()
 
         // Use a UIHostingController as window root view controller.
-        lazy var window = UIWindow(frame: UIScreen.main.bounds)
+        let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = UIHostingController(rootView: contentView)
         self.window = window
         window.makeKeyAndVisible()
@@ -55,16 +55,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
-        
-        let textURL: URL = FirebaseHelpers.uploadSessionLog()
-        
-        /// remove the text file used for firebase upload
-        do {
-            try FileManager.default.removeItem(at: textURL)
-        } catch {
-            print("error with removing text file", error)
-        }
-        print("text file is removed")
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

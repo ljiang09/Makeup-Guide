@@ -361,7 +361,10 @@ extension ARSessionManager: ARSCNViewDelegate {
                     self.isNeckImageShowing = false
                     self.isButtonShowing = true
                 }
-                timer2.invalidate()
+                if (timer2 != nil) {
+                    timer2.invalidate()
+                    timer2 = nil
+                }
                 firetimer3()
             }
         }
@@ -402,6 +405,7 @@ extension ARSessionManager: ARSCNViewDelegate {
         scnFaceGeometry.update(from: faceAnchor.geometry)
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
         
+        sessionData.log(faceGeometry: faceAnchor.geometry)
         sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
     }
     
