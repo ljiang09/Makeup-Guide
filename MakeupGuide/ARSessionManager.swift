@@ -420,7 +420,6 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
         if (collectingData) {
-            print("collecting data")
             sessionData.log(faceGeometry: faceAnchor.geometry)
             sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
             

@@ -49,40 +49,40 @@ class FirebaseHelpers {
                          .child("analytics_file.txt")
         
         
-        let jsonDict = ["faceGeometries": sessionData.faceGeometries.map({ faceGeometry in
-                             ["timestamp": faceGeometry.0,
-                              "vertices": faceGeometry.1.vertices.map({ vertex in
-                                  [vertex.x, vertex.y, vertex.z]
-                              }),
-                              "textureCoords": faceGeometry.1.textureCoordinates.map({ coords in
-                                 [coords.x, coords.y]
-                              }),
-                              "triangleCount": faceGeometry.1.triangleCount,
-                              "triangleIndices": faceGeometry.1.triangleIndices
-                             ]
+        let jsonDict = [
+//            "faceGeometries": sessionData.faceGeometries.map({ faceGeometry in
+//                             ["timestamp": faceGeometry.0,
+//                              "vertices": faceGeometry.1.vertices.map({ vertex in
+//                                  [vertex.x, vertex.y, vertex.z]
+//                              }),
+//                              "textureCoords": faceGeometry.1.textureCoordinates.map({ coords in
+//                                 [coords.x, coords.y]
+//                              }),
+//                              "triangleCount": faceGeometry.1.triangleCount,
+//                              "triangleIndices": faceGeometry.1.triangleIndices
+//                             ]
+//                        }),
+                        "facePosAndOrient": sessionData.facePosAndOrient.map({ value in
+                            ["timestamp": value.0,
+                             "transformMatrix": value.1,
+                             "positionDeclaration": value.2,
+                             "orientationDeclaration": value.3
+                            ]
+                        }),
+                        "voiceovers": sessionData.voiceovers.map({ value in
+                            ["timestamp": value.0,
+                             "voiceoverLine": value.1
+                            ]
+                        }),
+                        "buttonsClicked": sessionData.buttonsClicked.map({ value in
+                            ["timestamp": value.0,
+                             "buttonClicked": value.1
+                            ]
+                        }),
+                        "imagesCollected": sessionData.imageCollection.map({ value in
+                            ["timestamp": value.0,
+                             "whichImage": value.1]
                         })
-//                        ,
-//                        "facePosAndOrient": sessionData.facePosAndOrient.map({ value in
-//                            ["timestamp": value.0,
-//                             "transformMatrix": value.1,
-//                             "positionDeclaration": value.2,
-//                             "orientionDeclaration": value.3
-//                            ]
-//                        }),
-//                        "voiceovers": sessionData.voiceovers.map({ value in
-//                            ["timestamp": value.0,
-//                             "voiceoverLine": value.1
-//                            ]
-//                        }),
-//                        "buttonsClicked": sessionData.buttonsClicked.map({ value in
-//                            ["timestamp": value.0,
-//                             "buttonClicked": value.1
-//                            ]
-//                        }),
-//                        "imagesCollected": sessionData.imageCollection.map({ value in
-//                            ["timestamp": value.0,
-//                             "whichImage": value.1]
-//                        })
                         ]
         
         print("compiled json data successfully")
