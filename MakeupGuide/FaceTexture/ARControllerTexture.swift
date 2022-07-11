@@ -1,9 +1,10 @@
-//
-//  ARControllerTexture.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/24/22.
-//  https://github.com/mattbierner/headshot
+/*
+ARControllerTexture.swift
+https://github.com/mattbierner/headshot
+Created by Lily Jiang on 6/24/22
+
+This file ______
+*/
 
 import ARKit
 import SceneKit

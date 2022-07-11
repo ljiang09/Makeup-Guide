@@ -1,5 +1,5 @@
 /*
- FirebaseHelpers.swift
+FirebaseHelpers.swift
 MakeupGuide
 Created by Lily Jiang on 7/8/22
 
@@ -32,5 +32,20 @@ class FirebaseHelpers {
         
         /// store the image at the specified file location
         ref.putData(imageData)
+    }
+    
+    
+    public static func upload(log: LogSessionData) {
+        
+        // reach into LogSessionData and get all the information there
+        // upload tht info to firebase Storage at the right location
+        // if successful, clear variables like faceGeometries
+        
+//        @ObservedObject var generalHelpers = GeneralHelpers.shared
+//
+//        let ref = Storage.storage().reference().child("analytics").child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
+//
+//        /// store the image at the specified file location
+//        ref.putData(voiceOver.data(using: .utf8)!)
     }
 }
