@@ -59,6 +59,7 @@ struct ContentView : View {
             
             // for debugging purposes
             Button("Upload") {
+                print("upload button clicked")
                 FirebaseHelpers.uploadSessionLog()
             }
         }

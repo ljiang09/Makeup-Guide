@@ -36,8 +36,11 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
+    var timer4: Timer! = nil        // for sending AR analytics every 0.5 seconds rather than every frame (120 fps)
+    
     @ObservedObject var sessionData = LogSessionData.shared
     
+    var collectingData: Bool = false        // toggled by timer and collection in delegate. spaces out analytic collection so it's not every frame
     
     /// for the first set of UV textures, when the app first opens
     var headOnImgDirectory1: URL!
@@ -70,7 +73,7 @@ class ARSessionManager: NSObject, ObservableObject {
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
         
-        
+        fireTimer4()
         
         /// after half a second, call function to check whether the user's face is positioned well in the screen.
         /// once the face is centered, run the next phase of face rotation/snapshot gathering
@@ -102,7 +105,7 @@ class ARSessionManager: NSObject, ObservableObject {
     ///
     /// it continually checks the face position until the face is centered and then runs the closure
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
-        print("Timer 1 fired!")
+//        print("Timer 1 fired!")
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
             if (self.facePosition == "Face is centered") {
                 timer1.invalidate()
@@ -137,7 +140,7 @@ class ARSessionManager: NSObject, ObservableObject {
         timer2.tolerance = 0.4
         
         RunLoop.current.add(timer2, forMode: .default)
-        print("Timer 2 fired!")
+//        print("Timer 2 fired!")
     }
     
     /// this is fired after the initial 3 UV images are collected.
@@ -148,7 +151,17 @@ class ARSessionManager: NSObject, ObservableObject {
         timer3.tolerance = 0.1
         
         RunLoop.current.add(timer3, forMode: .default)
-        print("Timer 3 fired!")
+//        print("Timer 3 fired!")
+    }
+    
+    func fireTimer4() {
+//        print("timer 4 fired")
+        timer4 = Timer(fire: Date(), interval: 0.5, repeats: true, block: { _ in
+            self.collectingData = true
+        })
+        timer4.tolerance = 0.05
+        
+        RunLoop.current.add(timer4, forMode: .default)
     }
     
     func ontimer2Reset() {
@@ -405,8 +418,14 @@ extension ARSessionManager: ARSCNViewDelegate {
         scnFaceGeometry.update(from: faceAnchor.geometry)
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
         
-        sessionData.log(faceGeometry: faceAnchor.geometry)
-        sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
+        // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
+        if (collectingData) {
+            print("collecting data")
+            sessionData.log(faceGeometry: faceAnchor.geometry)
+            sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
+            
+            collectingData = false
+        }
     }
     
 }
