@@ -12,6 +12,7 @@ This file holds all the helper functions to create sound (voiceovers, pings, etc
 import AudioToolbox
 import AVFoundation
 import UIKit
+import SwiftUI
 
 
 
@@ -92,6 +93,8 @@ class SoundHelper: NSObject {
     ///
     /// - Parameter announcement: the text to read to the user
     func announce(announcement: String) {
+        @ObservedObject var sessionData = LogSessionData.shared
+        
         // ensure the code is running on the main thread
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -134,6 +137,8 @@ class SoundHelper: NSObject {
                 print("Unexpteced error announcing something using AVSpeechEngine!")
             }
         }
+        
+        sessionData.log(voiceOver: announcement)
     }
     
     

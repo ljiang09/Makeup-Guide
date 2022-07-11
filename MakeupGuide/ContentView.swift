@@ -15,6 +15,7 @@ struct ContentView : View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     @ObservedObject var arManager = ARSessionManager.shared
+    @ObservedObject var sessionData = LogSessionData.shared
     @State private var showingCheckImage = false
     
     var body: some View {
@@ -25,6 +26,7 @@ struct ContentView : View {
             if ((arManager.isButtonShowing) && (!arManager.generatingFaceTextures2)) {
                 Button(action: {
                     arManager.setGeneratingFaceTextures2(setTo: true)
+                    sessionData.log(whichButton: "Check your makeup")
                 }, label: {
                     Text("Check your makeup")
                         .padding(30)

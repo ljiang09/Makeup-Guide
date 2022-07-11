@@ -25,7 +25,10 @@ class FirebaseHelpers {
         @ObservedObject var generalHelpers = GeneralHelpers.shared
         
         /// root -> face_images -> user UUID -> fileName.jpg
-        let ref = Storage.storage().reference().child("face_images").child(generalHelpers.userDefaults.string(forKey: "SessionID")!).child(fileName + ".jpg")
+        let ref = Storage.storage().reference()
+                         .child("face_images")
+                         .child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
+                         .child(fileName + ".jpg")
         
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
@@ -35,17 +38,67 @@ class FirebaseHelpers {
     }
     
     
-    public static func upload(log: LogSessionData) {
+    public static func uploadSessionLog() -> URL {
+        @ObservedObject var sessionData = LogSessionData.shared
+        @ObservedObject var generalHelpers = GeneralHelpers.shared
         
-        // reach into LogSessionData and get all the information there
-        // upload tht info to firebase Storage at the right location
-        // if successful, clear variables like faceGeometries
         
-//        @ObservedObject var generalHelpers = GeneralHelpers.shared
-//
-//        let ref = Storage.storage().reference().child("analytics").child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
-//
-//        /// store the image at the specified file location
-//        ref.putData(voiceOver.data(using: .utf8)!)
+        // encode into json
+        // send that json Data object to firebase
+        
+//        do {
+//            let employeeData = try JSONEncoder().encode(Employee(name: "abc def", ssn: "123456789"))
+//            UserDefaults.standard.set(employeeData, forKey: employeeDataKey)
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+        
+        let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let url: URL = documents.appendingPathComponent("sessionLog.txt")
+        
+        if (FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)) {
+            print("File created successfully.")
+        } else {
+            print("File not created.")
+        }
+        
+        do {
+            try sessionData.faceGeometries.description.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+//            print("geometries written to file")
+            try sessionData.facePosAndOrient.description.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+//            print("position and orientation written to file")
+            try sessionData.voiceovers.description.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+//            print("voiceovers written to file")
+            try sessionData.buttonsClicked.description.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+//            print("clicked buttons written to file")
+        } catch {
+            print("error with writing to file", error)
+        }
+        
+        let ref = Storage.storage().reference()
+                         .child("analytics")
+                         .child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
+                         .child("analytics_file")
+        
+        ref.putFile(from: url, metadata: nil) { (metadata, error) in
+            guard metadata != nil else {
+                print(error ?? "Error with uploading session data to firebase")
+                return
+            }
+            
+            /// if successful, clear sessionData variables
+            sessionData.faceGeometries.removeAll()
+            sessionData.facePosAndOrient.removeAll()
+            sessionData.voiceovers.removeAll()
+            sessionData.buttonsClicked.removeAll()
+            print("local data is cleared")
+        }
+        print("successful upload")
+        
+        let value: UInt8 = 123
+        let data = Data([value])
+        ref.putData(data)
+        
+        return url
     }
 }

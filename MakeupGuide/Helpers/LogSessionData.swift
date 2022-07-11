@@ -23,20 +23,30 @@ class LogSessionData: ObservableObject {
     // time, button name
     var buttonsClicked: [(Double, String)] = []
     
+    var imageCollection: [(Double, String)] = []
     
+    
+    /// for face geometry
     func log(faceGeometry: ARFaceGeometry) {
         faceGeometries.append((Date().timeIntervalSince1970, faceGeometry))
     }
     
-    func logFacePositionOrientation(transform: [[Float]], position: String, orientation: String) {
+    /// for face position and orientation
+    func log(transform: [[Float]], position: String, orientation: String) {
         facePosAndOrient.append((Date().timeIntervalSince1970, transform, position, orientation))
     }
     
-    func logVoiceOver(voiceOver: String) {
+    /// for voiceover
+    func log(voiceOver: String) {
         voiceovers.append((Date().timeIntervalSince1970, voiceOver))
     }
     
-    func logButtonPress(whichButton: String) {
+    /// for button press
+    func log(whichButton: String) {
         buttonsClicked.append((Date().timeIntervalSince1970, whichButton))
+    }
+    
+    func log(image: String) {
+        imageCollection.append((Date().timeIntervalSince1970, image))
     }
 }

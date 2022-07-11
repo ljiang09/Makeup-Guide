@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let contentView = ContentView()
 
         // Use a UIHostingController as window root view controller.
-        let window = UIWindow(frame: UIScreen.main.bounds)
+        lazy var window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = UIHostingController(rootView: contentView)
         self.window = window
         window.makeKeyAndVisible()
@@ -49,12 +49,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if (value != nil) {
                 do {
                     try FileManager.default.removeItem(at: value!)
-                    print("deleted image from Documents directory")
+//                    print("deleted image from Documents directory")
                 } catch {
                     print("Could not clear temp folder: \(error)")
                 }
             }
         }
+        
+        let textURL: URL = FirebaseHelpers.uploadSessionLog()
+        
+        /// remove the text file used for firebase upload
+        do {
+            try FileManager.default.removeItem(at: textURL)
+        } catch {
+            print("error with removing text file", error)
+        }
+        print("text file is removed")
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

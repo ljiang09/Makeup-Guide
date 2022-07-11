@@ -36,6 +36,7 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
+    @ObservedObject var sessionData = LogSessionData.shared
     
     
     /// for the first set of UV textures, when the app first opens
@@ -236,7 +237,7 @@ class ARSessionManager: NSObject, ObservableObject {
         // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
         // TODO: check to make sure the snapshots are actually good
         
-        collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn2")
+        collectFaceImage(whichImage: 3, expectedImage: "blank", fileName: "HeadOn2")
         collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
         collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
     }
@@ -293,6 +294,8 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 /// send the image to Firebase to be stored
                 FirebaseHelpers.upload(imageData: data, fileName: fileName)
+                
+                sessionData.log(image: fileName)
             }
         } else {
             print("export failed")
@@ -398,6 +401,8 @@ extension ARSessionManager: ARSCNViewDelegate {
         /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
         scnFaceGeometry.update(from: faceAnchor.geometry)
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
+        
+        sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
     }
     
 }
