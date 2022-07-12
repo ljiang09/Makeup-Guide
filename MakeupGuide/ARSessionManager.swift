@@ -36,7 +36,12 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
+    var timer4: Timer! = nil        // for collecting AR analytics every 0.5 seconds rather than every frame (120 fps)
+    var timer5: Timer! = nil        // for sending analytics to firebase every 10 seconds
     
+    @ObservedObject var sessionData = LogSessionData.shared
+    
+    var collectingData: Bool = false        // toggled by timer and collection in delegate. spaces out analytic collection so it's not every frame
     
     /// for the first set of UV textures, when the app first opens
     var headOnImgDirectory1: URL!
@@ -69,7 +74,8 @@ class ARSessionManager: NSObject, ObservableObject {
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
         
-        
+        fireTimer4()
+        fireTimer5()
         
         /// after half a second, call function to check whether the user's face is positioned well in the screen.
         /// once the face is centered, run the next phase of face rotation/snapshot gathering
@@ -101,7 +107,7 @@ class ARSessionManager: NSObject, ObservableObject {
     ///
     /// it continually checks the face position until the face is centered and then runs the closure
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
-        print("Timer 1 fired!")
+//        print("Timer 1 fired!")
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
             if (self.facePosition == "Face is centered") {
                 timer1.invalidate()
@@ -136,7 +142,7 @@ class ARSessionManager: NSObject, ObservableObject {
         timer2.tolerance = 0.4
         
         RunLoop.current.add(timer2, forMode: .default)
-        print("Timer 2 fired!")
+//        print("Timer 2 fired!")
     }
     
     /// this is fired after the initial 3 UV images are collected.
@@ -147,7 +153,34 @@ class ARSessionManager: NSObject, ObservableObject {
         timer3.tolerance = 0.1
         
         RunLoop.current.add(timer3, forMode: .default)
-        print("Timer 3 fired!")
+//        print("Timer 3 fired!")
+    }
+    
+    func fireTimer4() {
+//        print("timer 4 fired")
+        timer4 = Timer(fire: Date(), interval: 0.5, repeats: true, block: { _ in
+            self.collectingData = true
+        })
+        timer4.tolerance = 0.05
+        
+        RunLoop.current.add(timer4, forMode: .default)
+    }
+    
+    func fireTimer5() {
+        print("timer 5 fired")
+        var counter: Int = 0
+        timer5 = Timer(fire: Date(), interval: 10, repeats: true, block: { _ in
+            /// don't send data right when the app starts - it'll be blank
+            if (counter != 0) {
+                FirebaseHelpers.uploadSessionLog(int: counter)
+//                print("uploded to firebase")
+            }
+            counter += 1
+            self.sessionData.clearLogVariables()
+        })
+        timer5.tolerance = 1.0
+        
+        RunLoop.current.add(timer5, forMode: .default)
     }
     
     func ontimer2Reset() {
@@ -236,7 +269,7 @@ class ARSessionManager: NSObject, ObservableObject {
         // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
         // TODO: check to make sure the snapshots are actually good
         
-        collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn2")
+        collectFaceImage(whichImage: 3, expectedImage: "blank", fileName: "HeadOn2")
         collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
         collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
     }
@@ -293,6 +326,8 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 /// send the image to Firebase to be stored
                 FirebaseHelpers.upload(imageData: data, fileName: fileName)
+                
+                sessionData.log(image: fileName)
             }
         } else {
             print("export failed")
@@ -358,7 +393,10 @@ extension ARSessionManager: ARSCNViewDelegate {
                     self.isNeckImageShowing = false
                     self.isButtonShowing = true
                 }
-                timer2.invalidate()
+                if (timer2 != nil) {
+                    timer2.invalidate()
+                    timer2 = nil
+                }
                 firetimer3()
             }
         }
@@ -398,6 +436,16 @@ extension ARSessionManager: ARSCNViewDelegate {
         /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
         scnFaceGeometry.update(from: faceAnchor.geometry)
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
+        
+        // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
+        if (collectingData) {
+            sessionData.log(faceGeometry: faceAnchor.geometry)
+            
+            // TODO: this one can be outside of the timer,as it doesn't have a shit ton of data every time. idk
+            sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
+            
+            collectingData = false
+        }
     }
     
 }

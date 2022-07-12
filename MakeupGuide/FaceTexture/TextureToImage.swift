@@ -1,12 +1,11 @@
-//
-//  TextureToImage.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/24/22.
-//  https://github.com/mattbierner/headshot
+/*
+TextureToImage.swift
+https://github.com/mattbierner/headshot
+Created by Lily Jiang on 6/24/22
 
+This file ______
+*/
 
-/// really only needed for debugging/verifying atm
 
 import Foundation
 import Metal

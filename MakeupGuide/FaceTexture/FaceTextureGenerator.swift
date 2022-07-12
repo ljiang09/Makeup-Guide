@@ -1,9 +1,10 @@
-//
-//  FaceTexture.swift
-//  MakeupGuide
-//
-//  Created by Lily Jiang on 6/24/22.
-//  https://github.com/mattbierner/headshot
+/*
+FaceTexture.swift
+https://github.com/mattbierner/headshot
+Created by Lily Jiang on 6/24/22
+
+This file ______
+*/
 
 
 import Foundation

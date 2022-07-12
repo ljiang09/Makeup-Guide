@@ -16,6 +16,7 @@
 		C44E80712866383C00550CE8 /* ARControllerTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80702866383C00550CE8 /* ARControllerTexture.swift */; };
 		C44E80732866386500550CE8 /* TextureToImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E80722866386500550CE8 /* TextureToImage.swift */; };
 		C44E8075286641B500550CE8 /* faceTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = C44E8074286641B500550CE8 /* faceTexture.metal */; };
+		C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4675A5E287C6F3D008BE643 /* LogSessionData.swift */; };
 		C475427428769E7800A5C948 /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C475427328769E7800A5C948 /* SuccessSound.wav */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
@@ -55,6 +56,7 @@
 		C44E80702866383C00550CE8 /* ARControllerTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARControllerTexture.swift; sourceTree = "<group>"; };
 		C44E80722866386500550CE8 /* TextureToImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureToImage.swift; sourceTree = "<group>"; };
 		C44E8074286641B500550CE8 /* faceTexture.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = faceTexture.metal; sourceTree = "<group>"; };
+		C4675A5E287C6F3D008BE643 /* LogSessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSessionData.swift; sourceTree = "<group>"; };
 		C475427328769E7800A5C948 /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SuccessSound.wav; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 				C4E508B1285920D00020EF3D /* CheckFaceHelper.swift */,
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 				C435EB482878B7AB007BA89B /* FirebaseHelpers.swift */,
+				C4675A5E287C6F3D008BE643 /* LogSessionData.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
 				C4E50885285912A60020EF3D /* Experience.rcproject in Sources */,
 				C4E508AD28591FB50020EF3D /* VCGeneralHelpers.swift in Sources */,
+				C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */,
 				C44E80732866386500550CE8 /* TextureToImage.swift in Sources */,
 				C44E8075286641B500550CE8 /* faceTexture.metal in Sources */,
 			);

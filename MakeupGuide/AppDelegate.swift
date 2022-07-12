@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if (value != nil) {
                 do {
                     try FileManager.default.removeItem(at: value!)
-                    print("deleted image from Documents directory")
+//                    print("deleted image from Documents directory")
                 } catch {
                     print("Could not clear temp folder: \(error)")
                 }
