@@ -51,6 +51,16 @@ class LogSessionData: ObservableObject {
         imageCollection.append((Date().timeIntervalSince1970, image))
     }
     
+    /// clears the variables to prepare for the next Firebase upload (ensures stuff doesn't get written multiple times)
+    func clearLogVariables() {
+        faceGeometries = []
+        facePosAndOrient = []
+        voiceovers = []
+        buttonsClicked = []
+        imageCollection = []
+//        print("log variables cleared")
+    }
+    
 //    func compileToJSON() -> [String: [String: Double]] {
 //        ["faceGeometries": sessionData.faceGeometries.map({ faceGeometry in ["timestamp": faceGeometry.0, "vertices": faceGeometry.1.vertices.map({ vertex in [vertex.x, vertex.y, vertex.z ]})] } ) ]
 //        // compile all the data into a dictionaty. return that

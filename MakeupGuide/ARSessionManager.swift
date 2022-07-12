@@ -36,7 +36,8 @@ class ARSessionManager: NSObject, ObservableObject {
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
     var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
-    var timer4: Timer! = nil        // for sending AR analytics every 0.5 seconds rather than every frame (120 fps)
+    var timer4: Timer! = nil        // for collecting AR analytics every 0.5 seconds rather than every frame (120 fps)
+    var timer5: Timer! = nil        // for sending analytics to firebase every 10 seconds
     
     @ObservedObject var sessionData = LogSessionData.shared
     
@@ -74,6 +75,7 @@ class ARSessionManager: NSObject, ObservableObject {
             textureSize: faceTextureSize)
         
         fireTimer4()
+        fireTimer5()
         
         /// after half a second, call function to check whether the user's face is positioned well in the screen.
         /// once the face is centered, run the next phase of face rotation/snapshot gathering
@@ -162,6 +164,23 @@ class ARSessionManager: NSObject, ObservableObject {
         timer4.tolerance = 0.05
         
         RunLoop.current.add(timer4, forMode: .default)
+    }
+    
+    func fireTimer5() {
+        print("timer 5 fired")
+        var counter: Int = 0
+        timer5 = Timer(fire: Date(), interval: 10, repeats: true, block: { _ in
+            /// don't send data right when the app starts - it'll be blank
+            if (counter != 0) {
+                FirebaseHelpers.uploadSessionLog(int: counter)
+//                print("uploded to firebase")
+            }
+            counter += 1
+            self.sessionData.clearLogVariables()
+        })
+        timer5.tolerance = 1.0
+        
+        RunLoop.current.add(timer5, forMode: .default)
     }
     
     func ontimer2Reset() {
@@ -421,6 +440,8 @@ extension ARSessionManager: ARSCNViewDelegate {
         // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
         if (collectingData) {
             sessionData.log(faceGeometry: faceAnchor.geometry)
+            
+            // TODO: this one can be outside of the timer,as it doesn't have a shit ton of data every time. idk
             sessionData.log(transform: faceAnchorTransform, position: facePosition, orientation: faceOrientation)
             
             collectingData = false

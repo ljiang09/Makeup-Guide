@@ -38,7 +38,7 @@ class FirebaseHelpers {
     }
     
     
-    public static func uploadSessionLog() {
+    public static func uploadSessionLog(int: Int) {
         let sessionData = LogSessionData.shared
         let generalHelpers = GeneralHelpers.shared
         
@@ -46,22 +46,21 @@ class FirebaseHelpers {
         let ref = Storage.storage().reference()
                          .child("analytics")
                          .child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
-                         .child("analytics_file.txt")
+                         .child("analytics_file_\(int).txt")
         
         
-        let jsonDict = [
-//            "faceGeometries": sessionData.faceGeometries.map({ faceGeometry in
-//                             ["timestamp": faceGeometry.0,
-//                              "vertices": faceGeometry.1.vertices.map({ vertex in
-//                                  [vertex.x, vertex.y, vertex.z]
-//                              }),
-//                              "textureCoords": faceGeometry.1.textureCoordinates.map({ coords in
-//                                 [coords.x, coords.y]
-//                              }),
-//                              "triangleCount": faceGeometry.1.triangleCount,
-//                              "triangleIndices": faceGeometry.1.triangleIndices
-//                             ]
-//                        }),
+        let jsonDict = ["faceGeometries": sessionData.faceGeometries.map({ faceGeometry in
+                             ["timestamp": faceGeometry.0,
+                              "vertices": faceGeometry.1.vertices.map({ vertex in
+                                  [vertex.x, vertex.y, vertex.z]
+                              }),
+                              "textureCoords": faceGeometry.1.textureCoordinates.map({ coords in
+                                 [coords.x, coords.y]
+                              }),
+                              "triangleCount": faceGeometry.1.triangleCount,
+                              "triangleIndices": faceGeometry.1.triangleIndices
+                             ]
+                        }),
                         "facePosAndOrient": sessionData.facePosAndOrient.map({ value in
                             ["timestamp": value.0,
                              "transformMatrix": value.1,
@@ -85,7 +84,7 @@ class FirebaseHelpers {
                         })
                         ]
         
-        print("compiled json data successfully")
+//        print("compiled json data successfully")
         
         do {
             let jsonData = try! JSONSerialization.data(withJSONObject: jsonDict)
@@ -95,8 +94,6 @@ class FirebaseHelpers {
                     print(error ?? "Error with uploading debug data to firebase")
                     return
                 }
-                print("uploading session log...")
-                FirebaseHelpers.uploadSessionLog()
                 print("successfully uploaded json \(String(describing: metadata))")
             }
         }

@@ -55,13 +55,6 @@ struct ContentView : View {
                     .frame(width: 200, height: 200)
                     .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
             }
-            
-            
-            // for debugging purposes
-            Button("Upload") {
-                print("upload button clicked")
-                FirebaseHelpers.uploadSessionLog()
-            }
         }
     }
     
