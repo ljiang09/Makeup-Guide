@@ -74,17 +74,63 @@ class ARSessionManager: NSObject, ObservableObject {
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
         
-        runAtBeginning()
+        
+        appIntroduction()
+        
+        runAtBeginning2()
         
     }
     
-    func runAtBeginning() {
+    /// runs voiceovers at the beginning to get the user acquainted with the app
+    func appIntroduction() {
+        let announcement: String = """
+                                   This app uses the front facing camera to check your makeup. \
+                                   For the app to work properly, make sure you don't have makeup \
+                                   on when you first open the app. \
+                                   First, you'll be guided to center your face in the screen. \
+                                   When you're centered, a success sound will play and you'll go \
+                                   into the next section of the app where three images will be taken \
+                                   of your face with no makeup on. \
+                                   Once those images are successfully taken, a success sound will \
+                                   play and you can then apply makeup. When you're done applying \
+                                   makeup, press the button that says "Check your makeup", located \
+                                   at the bottom of the screen. It will prompt you to gather another \
+                                   set of face images.
+                                   """
+        // TODO: show the text
+        
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)
+        }
+        else {
+            let audioSession = AVAudioSession.sharedInstance()
+            
+            do {
+                // make the audio play even if the ringer is off
+                try audioSession.setCategory(AVAudioSession.Category.playback)
+                try audioSession.setActive(true)
+                
+                let utterance = AVSpeechUtterance(string: announcement)
+                utterance.rate = 0.5
+                SoundHelper.shared.synthesizer.speak(utterance)
+            } catch {
+                print("Unexpected error announcing something using AVSpeechEngine!")
+            }
+        }
+        
+        // TODO: hide the text
+        
+        // wait for half a second, then run the next portion of code
+        
+    }
+    
+    /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
+    func runAtBeginning2() {
         fireTimer4()
         fireTimer5()
         
-        /// after half a second, call function to check whether the user's face is positioned well in the screen.
-        /// once the face is centered, run the next phase of face rotation/snapshot gathering
-        /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
+        // here, remind them to use the front facing camera to see how the thing works
+        
         self.checkFaceUntilRepositioned(completion: {
             SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
             
