@@ -171,6 +171,9 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
             self.nextAnnouncement = nil
             announce(announcement: nextAnnouncement)
         }
+        
+        // send some kind of notification to the ar session manager.. maybe run a function in there?
+        
     }
     /// Called when an utterance is canceled.  We implement this function so that we can keep track of
     /// whether or not an announcement is currently being read to the user.

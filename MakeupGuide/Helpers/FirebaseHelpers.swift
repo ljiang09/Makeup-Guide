@@ -24,14 +24,14 @@ class FirebaseHelpers {
     public static func upload(imageData: Data, fileName: String) {
         @ObservedObject var generalHelpers = GeneralHelpers.shared
         
-        /// root -> face_images -> user UUID -> fileName.jpg
+        /// root -> face_images -> user UUID -> fileName.png
         let ref = Storage.storage().reference()
                          .child("face_images")
                          .child(generalHelpers.userDefaults.string(forKey: "SessionID")!)
-                         .child(fileName + ".jpg")
+                         .child(fileName + ".png")
         
         let metadata = StorageMetadata()
-        metadata.contentType = "image/jpeg"
+        metadata.contentType = "image/png"
         
         /// store the image at the specified file location
         ref.putData(imageData, metadata: metadata)
