@@ -22,6 +22,28 @@ struct ContentView : View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
+            if (arManager.isIntroTextShowing) {
+                VStack(spacing: 40) {
+                    Text(arManager.introText)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.white)
+                        .background(Color.black.opacity(0.5))
+                    
+                    Button(action: {
+                        arManager.runAtBeginning2()
+                        arManager.isIntroTextShowing = false
+                        // TODO: interrupt the current voiceover
+                    }, label: {
+                        Text("Done")
+                            .padding(30)
+                            .font(.system(size: 30))
+                            .foregroundColor(.black)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                    })
+//                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+                }
+            }
             
             if ((arManager.isButtonShowing) && (!arManager.generatingFaceTextures2)) {
                 Button(action: {
