@@ -134,6 +134,7 @@ class ARSessionManager: NSObject, ObservableObject {
         
         self.checkFaceUntilRepositioned(completion: {
             SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+            // TODO: run voiceover saying "face is centered"
             
             self.isCheckImageShowing = true
             /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
@@ -158,9 +159,12 @@ class ARSessionManager: NSObject, ObservableObject {
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
 //        print("Timer 1 fired!")
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
+            // TODO: change timer value (or add another timer) to check face centered more often than every 3 seconds
             if (self.facePosition == "Face is centered") {
                 timer1.invalidate()
                 completion()
+            } else {
+                SoundHelper.shared.announce(announcement: "please position your face in the screen")
             }
             
             if (self.facePosition != "blank") {
@@ -171,11 +175,11 @@ class ARSessionManager: NSObject, ObservableObject {
                     }
                 }
             }
-            else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
-                }
-            }
+//            else {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+//                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
+//                }
+//            }
         })
         timer1.tolerance = 0.2
         RunLoop.current.add(timer1, forMode: .default)
