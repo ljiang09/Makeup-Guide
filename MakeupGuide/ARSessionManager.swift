@@ -74,32 +74,34 @@ class ARSessionManager: NSObject, ObservableObject {
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
         
+        runAtBeginning()
+        
+    }
+    
+    func runAtBeginning() {
         fireTimer4()
         fireTimer5()
         
         /// after half a second, call function to check whether the user's face is positioned well in the screen.
         /// once the face is centered, run the next phase of face rotation/snapshot gathering
         /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.checkFaceUntilRepositioned(completion: {
-                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+        self.checkFaceUntilRepositioned(completion: {
+            SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+            
+            self.isCheckImageShowing = true
+            /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.isCheckImageShowing = false
                 
-                self.isCheckImageShowing = true
-                /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.isCheckImageShowing = false
+                    self.isNeckImageShowing = true
+                    SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        self.isNeckImageShowing = true
-                        SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
-                        
-                        /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
-                        self.firetimer2()
-                    }
+                    /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                    self.firetimer2()
                 }
-            })
-        }
-        
+            }
+        })
     }
     
     /// this function is intended to run at the beginning of the app lifecycle
