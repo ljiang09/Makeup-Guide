@@ -125,6 +125,10 @@ class ARSessionManager: NSObject, ObservableObject {
         SoundHelper.shared.synthesizer.stopSpeaking(at: .immediate)
     }
     
+    func voiceoverEnded() {
+        // change some variable here. whenever this function is called, it should change a published variable here
+    }
+    
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
         fireTimer4()
@@ -353,7 +357,7 @@ class ARSessionManager: NSObject, ObservableObject {
             let url: URL = documents.appendingPathComponent(fileName)
             
             // save the image in the documents directory
-            if let data: Data = uiImage.jpegData(compressionQuality: 0.8) {
+            if let data: Data = uiImage.pngData() {
                 // TODO: mess with the compression quality to see if ti affects it a ton. find the sweet spot
                 do {
                     try data.write(to: url)
