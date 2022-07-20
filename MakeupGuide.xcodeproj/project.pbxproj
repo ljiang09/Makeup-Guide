@@ -19,6 +19,7 @@
 		C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4675A5E287C6F3D008BE643 /* LogSessionData.swift */; };
 		C475427428769E7800A5C948 /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C475427328769E7800A5C948 /* SuccessSound.wav */; };
 		C4ABB1DA287F09B0009A3F0F /* CompareFaceTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */; };
+		C4B0B6B828885C330055B375 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C4B0B6BA28885C330055B375 /* Localizable.strings */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
 		C4E50887285912AA0020EF3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E50886285912AA0020EF3D /* Assets.xcassets */; };
@@ -59,6 +60,9 @@
 		C4675A5E287C6F3D008BE643 /* LogSessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSessionData.swift; sourceTree = "<group>"; };
 		C475427328769E7800A5C948 /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SuccessSound.wav; sourceTree = "<group>"; };
 		C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareFaceTextures.swift; sourceTree = "<group>"; };
+		C4B0B6B928885C330055B375 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C4B0B6BB28885C690055B375 /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		C4B0B6BC28885CAD0055B375 /* en-AU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-AU"; path = "en-AU.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -192,6 +196,7 @@
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 				C435EB482878B7AB007BA89B /* FirebaseHelpers.swift */,
 				C4675A5E287C6F3D008BE643 /* LogSessionData.swift */,
+				C4B0B6BA28885C330055B375 /* Localizable.strings */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -295,6 +300,8 @@
 			knownRegions = (
 				en,
 				Base,
+				"en-GB",
+				"en-AU",
 			);
 			mainGroup = C4E50874285912A50020EF3D;
 			packageReferences = (
@@ -316,6 +323,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4B0B6B828885C330055B375 /* Localizable.strings in Resources */,
 				C4E5088A285912AA0020EF3D /* Preview Assets.xcassets in Resources */,
 				C435EB4B2878B84B007BA89B /* GoogleService-Info.plist in Resources */,
 				C475427428769E7800A5C948 /* SuccessSound.wav in Resources */,
@@ -392,11 +400,25 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		C4B0B6BA28885C330055B375 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C4B0B6B928885C330055B375 /* en */,
+				C4B0B6BB28885C690055B375 /* en-GB */,
+				C4B0B6BC28885CAD0055B375 /* en-AU */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		C4E508A1285912AA0020EF3D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -457,6 +479,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
