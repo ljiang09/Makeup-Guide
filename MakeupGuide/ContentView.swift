@@ -32,7 +32,7 @@ struct ContentView : View {
                     Button(action: {
                         arManager.runAtBeginning2()
                         arManager.isIntroTextShowing = false
-                        // TODO: interrupt the current voiceover
+                        arManager.interruptVoiceover()
                     }, label: {
                         Text("Done")
                             .padding(30)

@@ -121,6 +121,10 @@ class ARSessionManager: NSObject, ObservableObject {
         }
     }
     
+    func interruptVoiceover() {
+        SoundHelper.shared.synthesizer.stopSpeaking(at: .immediate)
+    }
+    
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
         fireTimer4()
