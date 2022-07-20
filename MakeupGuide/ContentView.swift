@@ -23,41 +23,51 @@ struct ContentView : View {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
             if (arManager.isIntroTextShowing) {
-                VStack(spacing: 40) {
+                VStack {
+                    Spacer()
+                    
                     Text(arManager.introText)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
                         .background(Color.black.opacity(0.5))
                     
+                    Spacer()
+                    
                     Button(action: {
-                        arManager.runAtBeginning2()
                         arManager.isIntroTextShowing = false
                         arManager.interruptVoiceover()
+                        arManager.runAtBeginning2()
                     }, label: {
                         Text("Done")
                             .padding(30)
-                            .font(.system(size: 30))
+                            .font(.system(size: UIScreen.main.bounds.width/13))
                             .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                     })
-//                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
                 }
             }
             
             if ((arManager.isButtonShowing) && (!arManager.generatingFaceTextures2)) {
-                Button(action: {
-                    arManager.setGeneratingFaceTextures2(setTo: true)
-                    sessionData.log(whichButton: "Check your makeup")
-                }, label: {
-                    Text("Check your makeup")
-                        .padding(30)
-                        .font(.system(size: 30))
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                })
-                .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height * 3/4)
+                VStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        arManager.setGeneratingFaceTextures2(setTo: true)
+                        sessionData.log(whichButton: "Check your makeup")
+                    }, label: {
+                        Text("Check your makeup")
+                            .padding(30)
+                            .font(.system(size: UIScreen.main.bounds.width/13))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                    })
+                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+                }
             }
             
             
