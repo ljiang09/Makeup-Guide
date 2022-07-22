@@ -14,15 +14,20 @@ import AVFoundation
 import UIKit
 import SwiftUI
 
+struct Announcement {
+    let text: String
+    let completionHandler: (()->())?
+}
 
 
 class SoundHelper: NSObject, ObservableObject {
     static var shared: SoundHelper = SoundHelper()
     let synthesizer = AVSpeechSynthesizer()     /// this should only be created once because it is memory intensive
     var player: AVAudioPlayer?
+    var completionHandler: (()->())?
     
     /// the voiceover callouts for face positioning
-    let rotateHeadInstructions = "slowly turn your head back and forth"
+    let rotateHeadInstructions = "slowly turn your head left and right"
     let headPosRight = "face is too far right of the camera"
     let headPosLeft = "face is too far left of the camera"
     let headPosTop = "face is too high in the camera"
@@ -38,8 +43,8 @@ class SoundHelper: NSObject, ObservableObject {
         }
     }
     
-    private var currentAnnouncement: String?        /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
-    private var nextAnnouncement: String?           /// The announcement that should be read immediately after this one finishes
+    private var currentAnnouncement: Announcement?        /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
+    private var nextAnnouncement: Announcement?           /// The announcement that should be read immediately after this one finishes
     private var announcementRemovalTimer: Timer?    /// times when an announcement should be removed.  These announcements are displayed on the `announcementText` label.
     
     private override init() {
@@ -53,10 +58,14 @@ class SoundHelper: NSObject, ObservableObject {
         }
         
         NotificationCenter.default.addObserver(forName: UIAccessibility.announcementDidFinishNotification, object: nil, queue: nil) { (notification) -> Void in
+            if let completionHandler = self.currentAnnouncement?.completionHandler {
+                completionHandler()
+            }
             self.currentAnnouncement = nil
+            // call completion handler
             if let nextAnnouncement = self.nextAnnouncement {
                 self.nextAnnouncement = nil
-                self.announce(announcement: nextAnnouncement)
+                self.announce(announcement: nextAnnouncement.text, completionHandler: nextAnnouncement.completionHandler)
             }
         }
         
@@ -99,7 +108,7 @@ class SoundHelper: NSObject, ObservableObject {
     /// Communicates a message to the user via speech.  If VoiceOver is active, then VoiceOver is used to communicate the announcement, otherwise we use the AVSpeechEngine
     ///
     /// - Parameter announcement: the text to read to the user
-    func announce(announcement: String) {
+    func announce(announcement: String, completionHandler: (()->())?=nil) {
         @ObservedObject var sessionData = LogSessionData.shared
         
         isSpeechDone = false
@@ -107,15 +116,15 @@ class SoundHelper: NSObject, ObservableObject {
         // ensure the code is running on the main thread
         if !Thread.isMainThread {
             DispatchQueue.main.async {
-                self.announce(announcement: announcement)
+                self.announce(announcement: announcement, completionHandler: completionHandler)
             }
             
             return
         }
         if let currentAnnouncement = currentAnnouncement {
             // don't interrupt current announcement, but if there is something new to say put it on the queue to say next.  Note that adding it to the queue in this fashion could result in the next queued announcement being preempted
-            if currentAnnouncement != announcement {
-                nextAnnouncement = announcement
+            if currentAnnouncement.text != announcement {
+                nextAnnouncement = Announcement(text: announcement, completionHandler: completionHandler)
             }
             
             return
@@ -124,7 +133,7 @@ class SoundHelper: NSObject, ObservableObject {
         // VoiceOver is the preferred option for TTS
         if UIAccessibility.isVoiceOverRunning {
 //            print("voice over")
-            currentAnnouncement = announcement
+            currentAnnouncement = Announcement(text: announcement, completionHandler: completionHandler)
             UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)
         }
         // but if the user hasn't enabled VoiceOver, use a synthesizer
@@ -142,7 +151,7 @@ class SoundHelper: NSObject, ObservableObject {
                 utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.languageCode)
                 utterance.rate = 0.5
 //                utterance.volume = 0.5
-                currentAnnouncement = announcement
+                currentAnnouncement = Announcement(text: announcement, completionHandler: completionHandler)
                 synthesizer.speak(utterance)
             } catch {
                 print("Unexpteced error announcing something using AVSpeechEngine!")
@@ -173,10 +182,13 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     ///   - utterance: the utterance itself
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didFinish utterance: AVSpeechUtterance) {
+        if let completionHandler = currentAnnouncement?.completionHandler {
+            completionHandler()
+        }
         currentAnnouncement = nil
         if let nextAnnouncement = self.nextAnnouncement {
             self.nextAnnouncement = nil
-            announce(announcement: nextAnnouncement)
+            announce(announcement: nextAnnouncement.text, completionHandler: nextAnnouncement.completionHandler)
         }
         
         isSpeechDone = true
@@ -190,10 +202,13 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     ///   - utterance: the utterance itself
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didCancel utterance: AVSpeechUtterance) {
+        if let completionHandler = currentAnnouncement?.completionHandler {
+            completionHandler()
+        }
         currentAnnouncement = nil
         if let nextAnnouncement = self.nextAnnouncement {
             self.nextAnnouncement = nil
-            announce(announcement: nextAnnouncement)
+            announce(announcement: nextAnnouncement.text, completionHandler: nextAnnouncement.completionHandler)
         }
     }
 }

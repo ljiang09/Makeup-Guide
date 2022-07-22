@@ -132,6 +132,8 @@ class ARSessionManager: NSObject, ObservableObject {
         fireTimer5()
         
         // TODO: here, remind them to use the front facing camera to see how the thing works
+        // wait until isSpeechDone is set to true
+        
         
         self.checkFaceUntilRepositioned(completion: {
             self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
@@ -144,7 +146,9 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.isNeckImageShowing = true
-                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions) {
+                        print("announcement is done!")
+                    }
                     
                     /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
                     self.firetimer2()
