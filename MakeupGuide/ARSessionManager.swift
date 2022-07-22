@@ -20,7 +20,7 @@ class ARSessionManager: NSObject, ObservableObject {
     let sceneView = ARSCNView(frame: .zero)
     
     static var shared: ARSessionManager = ARSessionManager()
-    @ObservedObject var soundHelper = SoundHelper.shared
+    let soundHelper = SoundHelper.shared
     
     @Published var isButtonShowing: Bool            // represents the button on the ContentView to get a second batch of images
     @Published var isNeckImageShowing: Bool
@@ -85,41 +85,24 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// runs voiceovers at the beginning to get the user acquainted with the app
     func appIntroduction() {
-    introText = """
-               This app uses the front facing camera to check your makeup. \
-               For the app to work properly, make sure you don't have makeup \
-               on when you first open the app. \
-               First, you'll be guided to center your face in the screen. \
-               When you're centered, a success sound will play and you'll go \
-               into the next section of the app where three images will be taken \
-               of your face with no makeup on. \
-               Once those images are successfully taken, a success sound will \
-               play and you can then apply makeup. When you're done applying \
-               makeup, press the button that says "Check your makeup", located \
-               at the bottom of the screen. It will prompt you to gather another \
-               set of face images. \
-               When you're done listening to this, press the "Done" button at the \
-               bottom of the screen.
-               """
+        introText = """
+                   This app uses the front facing camera to check your makeup. \
+                   For the app to work properly, make sure you don't have makeup \
+                   on when you first open the app. \
+                   First, you'll be guided to center your face in the screen. \
+                   When you're centered, a success sound will play and you'll go \
+                   into the next section of the app where three images will be taken \
+                   of your face with no makeup on. \
+                   Once those images are successfully taken, a success sound will \
+                   play and you can then apply makeup. When you're done applying \
+                   makeup, press the button that says "Check your makeup", located \
+                   at the bottom of the screen. It will prompt you to gather another \
+                   set of face images. \
+                   When you're done listening to this, press the "Done" button at the \
+                   bottom of the screen.
+                   """
         
-        if UIAccessibility.isVoiceOverRunning {
-            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: introText)
-        }
-        else {
-            let audioSession = AVAudioSession.sharedInstance()
-            
-            do {
-                // make the audio play even if the ringer is off
-                try audioSession.setCategory(AVAudioSession.Category.playback)
-                try audioSession.setActive(true)
-                
-                let utterance = AVSpeechUtterance(string: introText)
-                utterance.rate = 0.5
-                self.soundHelper.synthesizer.speak(utterance)
-            } catch {
-                print("Unexpected error announcing something using AVSpeechEngine!")
-            }
-        }
+        self.soundHelper.announce(announcement: introText)
     }
     
     func interruptVoiceover() {
@@ -128,12 +111,10 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
-        fireTimer4()
-        fireTimer5()
+        self.soundHelper.announce(announcement: "This app uses the front facing camera. Follow the voiceover prompts. Hold or prop up your phone at arms length for best results.")
         
-        // TODO: here, remind them to use the front facing camera to see how the thing works
-        // wait until isSpeechDone is set to true
-        
+        self.fireTimer4()
+        self.fireTimer5()
         
         self.checkFaceUntilRepositioned(completion: {
             self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
@@ -146,9 +127,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.isNeckImageShowing = true
-                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions) {
-                        print("announcement is done!")
-                    }
+                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
                     
                     /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
                     self.firetimer2()
