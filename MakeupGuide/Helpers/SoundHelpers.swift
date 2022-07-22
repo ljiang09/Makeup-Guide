@@ -27,7 +27,7 @@ class SoundHelper: NSObject, ObservableObject {
     var completionHandler: (()->())?
     
     /// the voiceover callouts for face positioning
-    let rotateHeadInstructions = "slowly turn your head left and right"
+    let rotateHeadInstructions = "slowly turn your head back and forth"
     let headPosRight = "face is too far right of the camera"
     let headPosLeft = "face is too far left of the camera"
     let headPosTop = "face is too high in the camera"
