@@ -20,6 +20,7 @@ class ARSessionManager: NSObject, ObservableObject {
     let sceneView = ARSCNView(frame: .zero)
     
     static var shared: ARSessionManager = ARSessionManager()
+    @ObservedObject var soundHelper = SoundHelper.shared
     
     @Published var isButtonShowing: Bool            // represents the button on the ContentView to get a second batch of images
     @Published var isNeckImageShowing: Bool
@@ -114,7 +115,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 let utterance = AVSpeechUtterance(string: introText)
                 utterance.rate = 0.5
-                SoundHelper.shared.synthesizer.speak(utterance)
+                self.soundHelper.synthesizer.speak(utterance)
             } catch {
                 print("Unexpected error announcing something using AVSpeechEngine!")
             }
@@ -122,11 +123,7 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     func interruptVoiceover() {
-        SoundHelper.shared.synthesizer.stopSpeaking(at: .immediate)
-    }
-    
-    func voiceoverEnded() {
-        // change some variable here. whenever this function is called, it should change a published variable here
+        self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
     }
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
@@ -137,7 +134,7 @@ class ARSessionManager: NSObject, ObservableObject {
         // TODO: here, remind them to use the front facing camera to see how the thing works
         
         self.checkFaceUntilRepositioned(completion: {
-            SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+            self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
             // TODO: run voiceover saying "face is centered"
             
             self.isCheckImageShowing = true
@@ -147,7 +144,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.isNeckImageShowing = true
-                    SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
                     
                     /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
                     self.firetimer2()
@@ -168,20 +165,20 @@ class ARSessionManager: NSObject, ObservableObject {
                 timer1.invalidate()
                 completion()
             } else {
-                SoundHelper.shared.announce(announcement: "please position your face in the screen")
+                self.soundHelper.announce(announcement: "please position your face in the screen")
             }
             
             if (self.facePosition != "blank") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    SoundHelper.shared.announce(announcement: self.facePosition)
+                    self.soundHelper.announce(announcement: self.facePosition)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        SoundHelper.shared.announce(announcement: self.faceOrientation)
+                        self.soundHelper.announce(announcement: self.faceOrientation)
                     }
                 }
             }
 //            else {
 //                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-//                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
+//                    self.soundHelper.announce(announcement: "please position your face in the screen")
 //                }
 //            }
         })
@@ -243,20 +240,20 @@ class ARSessionManager: NSObject, ObservableObject {
     func ontimer2Reset() {
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
-        SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
         
         /// state user face and orientation if the face is in the screen
         if (facePosition != "blank") {
             // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                SoundHelper.shared.announce(announcement: self.facePosition)
+                self.soundHelper.announce(announcement: self.facePosition)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    SoundHelper.shared.announce(announcement: self.faceOrientation)
+                    self.soundHelper.announce(announcement: self.faceOrientation)
                 }
             }
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                SoundHelper.shared.announce(announcement: "please position your face in the screen")
+                self.soundHelper.announce(announcement: "please position your face in the screen")
             }
         }
     }
@@ -264,9 +261,9 @@ class ARSessionManager: NSObject, ObservableObject {
     func ontimer3Reset() {
         /// check the face orientation and speak face is rotated and such
         if facePosition != "blank" {
-            SoundHelper.shared.announce(announcement: facePosition)
+            self.soundHelper.announce(announcement: facePosition)
         } else if faceOrientation != "blank" {
-            SoundHelper.shared.announce(announcement: faceOrientation)
+            self.soundHelper.announce(announcement: faceOrientation)
         }
     }
     
@@ -285,7 +282,7 @@ class ARSessionManager: NSObject, ObservableObject {
         /// start repeating reminders to remind the user to rotate their head
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.isNeckImageShowing = true
-            SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+            self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
             self.firetimer2()
         }
         
@@ -358,7 +355,6 @@ class ARSessionManager: NSObject, ObservableObject {
             
             // save the image in the documents directory
             if let data: Data = uiImage.pngData() {
-                // TODO: mess with the compression quality to see if ti affects it a ton. find the sweet spot
                 do {
                     try data.write(to: url)
                     switch (fileName) {
@@ -443,7 +439,7 @@ extension ARSessionManager: ARSCNViewDelegate {
             
             /// Finish collecting images. this runs once, right when the images just finished all getting collected
             if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2]) {
-                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+                self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
                 /// hide the instructional image
                 DispatchQueue.main.async {
@@ -466,7 +462,7 @@ extension ARSessionManager: ARSCNViewDelegate {
             
             /// Finish collecting images. this runs once, right when the images just finished all getting collected
             if (faceImagesCollected[3] && faceImagesCollected[4] && faceImagesCollected[5]) {
-                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+                self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
                 /// hide the instructional image
                 DispatchQueue.main.async {

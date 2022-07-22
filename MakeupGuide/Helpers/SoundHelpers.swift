@@ -16,7 +16,7 @@ import SwiftUI
 
 
 
-class SoundHelper: NSObject {
+class SoundHelper: NSObject, ObservableObject {
     static var shared: SoundHelper = SoundHelper()
     let synthesizer = AVSpeechSynthesizer()     /// this should only be created once because it is memory intensive
     var player: AVAudioPlayer?
@@ -32,6 +32,11 @@ class SoundHelper: NSObject {
     let headTiltUp = "face is tilted up"
     let headTiltDown = "face is tilted down"
     
+    @Published var isSpeechDone: Bool = false {
+        didSet {
+            print("isSpeechDone set")
+        }
+    }
     
     private var currentAnnouncement: String?        /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
     private var nextAnnouncement: String?           /// The announcement that should be read immediately after this one finishes
@@ -96,6 +101,8 @@ class SoundHelper: NSObject {
     /// - Parameter announcement: the text to read to the user
     func announce(announcement: String) {
         @ObservedObject var sessionData = LogSessionData.shared
+        
+        isSpeechDone = false
         
         // ensure the code is running on the main thread
         if !Thread.isMainThread {
@@ -172,7 +179,7 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
             announce(announcement: nextAnnouncement)
         }
         
-        // send some kind of notification to the ar session manager.. maybe run a function in there?
+        isSpeechDone = true
         
     }
     /// Called when an utterance is canceled.  We implement this function so that we can keep track of
