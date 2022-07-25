@@ -70,26 +70,26 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
                                         .stopTrackedRaycasts])
     }
     
-    public func renderer(_: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        guard anchor is ARFaceAnchor else {
-            return nil
-        }
-                
-        let node = SCNNode(geometry: scnFaceGeometry)
-        scnFaceGeometry.firstMaterial?.diffuse.contents = faceUvGenerator.texture
-        return node
-    }
+//    public func renderer(_: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+//        guard anchor is ARFaceAnchor else {
+//            return nil
+//        }
+//
+//        let node = SCNNode(geometry: scnFaceGeometry)
+//        scnFaceGeometry.firstMaterial?.diffuse.contents = faceUvGenerator.texture
+//        return node
+//    }
     
-    public func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        guard let faceAnchor = anchor as? ARFaceAnchor,
-              let frame = sceneView.session.currentFrame
-        else {
-            return
-        }
-        
-        self.previewFaceGeometry.update(from: faceAnchor.geometry)
-
-        scnFaceGeometry.update(from: faceAnchor.geometry)
-        faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
-    }
+//    public func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+//        guard let faceAnchor = anchor as? ARFaceAnchor,
+//              let frame = sceneView.session.currentFrame
+//        else {
+//            return
+//        }
+//
+//        self.previewFaceGeometry.update(from: faceAnchor.geometry)
+//
+//        scnFaceGeometry.update(from: faceAnchor.geometry)
+//        faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
+//    }
 }
