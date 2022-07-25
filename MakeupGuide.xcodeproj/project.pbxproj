@@ -18,6 +18,7 @@
 		C44E8075286641B500550CE8 /* faceTexture.metal in Sources */ = {isa = PBXBuildFile; fileRef = C44E8074286641B500550CE8 /* faceTexture.metal */; };
 		C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4675A5E287C6F3D008BE643 /* LogSessionData.swift */; };
 		C475427428769E7800A5C948 /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C475427328769E7800A5C948 /* SuccessSound.wav */; };
+		C4B0B6CB288EF4840055B375 /* TimerControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B0B6CA288EF4840055B375 /* TimerControllers.swift */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
 		C4E50885285912A60020EF3D /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = C4E50884285912A60020EF3D /* Experience.rcproject */; };
@@ -58,6 +59,7 @@
 		C44E8074286641B500550CE8 /* faceTexture.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = faceTexture.metal; sourceTree = "<group>"; };
 		C4675A5E287C6F3D008BE643 /* LogSessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSessionData.swift; sourceTree = "<group>"; };
 		C475427328769E7800A5C948 /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SuccessSound.wav; sourceTree = "<group>"; };
+		C4B0B6CA288EF4840055B375 /* TimerControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControllers.swift; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				C4F695912862206200C9E90A /* SoundHelpers.swift */,
 				C435EB482878B7AB007BA89B /* FirebaseHelpers.swift */,
 				C4675A5E287C6F3D008BE643 /* LogSessionData.swift */,
+				C4B0B6CA288EF4840055B375 /* TimerControllers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -341,6 +344,7 @@
 				C44E806F2866377400550CE8 /* FaceTextureGenerator.swift in Sources */,
 				C4E50883285912A60020EF3D /* ContentView.swift in Sources */,
 				C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */,
+				C4B0B6CB288EF4840055B375 /* TimerControllers.swift in Sources */,
 				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
 				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
