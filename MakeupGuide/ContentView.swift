@@ -24,6 +24,24 @@ struct ContentView : View {
             
             if (arManager.isIntroTextShowing) {
                 VStack {
+                    HStack {
+                        Spacer()
+                        
+                        Button(action: {
+                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                                UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+                            } else {
+                                UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+                            }
+                        }) {
+                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                                Text("turn voiceover off")
+                            } else {
+                                Text("turn voiceover on")
+                            }
+                        }
+                    }
+                    
                     Spacer()
                     
                     Text(arManager.introText)

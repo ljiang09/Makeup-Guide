@@ -13,7 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     @ObservedObject var arManager = ARSessionManager.shared
-    @ObservedObject var generalHelpers = GeneralHelpers.shared
     
 
     /// runs when the app session starts
@@ -31,7 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         
         /// at the start of the app session, set/reset the SessionID to be used in posting images to firebase
-        generalHelpers.userDefaults.set(UUID().uuidString, forKey: "SessionID")
+        UserDefaults.standard.set(UUID().uuidString, forKey: "SessionID")
+        UserDefaults.standard.set(true, forKey: "VoiceoversOn")
         
         return true
     }

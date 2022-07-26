@@ -97,6 +97,12 @@ class SoundHelper: NSObject {
     ///
     /// - Parameter announcement: the text to read to the user
     func announce(announcement: String) {
+        
+        // if the user doesn't want voiceovers, skip it
+        if (!UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+            return
+        }
+        
         @ObservedObject var sessionData = LogSessionData.shared
         
         // ensure the code is running on the main thread
