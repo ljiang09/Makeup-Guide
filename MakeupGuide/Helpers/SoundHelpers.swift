@@ -48,6 +48,9 @@ class SoundHelper: NSObject {
         
         NotificationCenter.default.addObserver(forName: UIAccessibility.announcementDidFinishNotification, object: nil, queue: nil) { (notification) -> Void in
             self.currentAnnouncement = nil
+            
+            // TODO: run closure here really quick before moving onto the next announcement
+            
             if let nextAnnouncement = self.nextAnnouncement {
                 self.nextAnnouncement = nil
                 self.announce(announcement: nextAnnouncement)
@@ -115,13 +118,11 @@ class SoundHelper: NSObject {
         
         // VoiceOver is the preferred option for TTS
         if UIAccessibility.isVoiceOverRunning {
-//            print("voice over")
             currentAnnouncement = announcement
             UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)
         }
         // but if the user hasn't enabled VoiceOver, use a synthesizer
         else {
-//            print("synthesizer")
             let audioSession = AVAudioSession.sharedInstance()
             
             do {
@@ -133,7 +134,6 @@ class SoundHelper: NSObject {
                 // change the utterance to be the local accent
                 utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.languageCode)
                 utterance.rate = 0.5
-//                utterance.volume = 0.5
                 currentAnnouncement = announcement
                 synthesizer.speak(utterance)
             } catch {
@@ -166,6 +166,9 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didFinish utterance: AVSpeechUtterance) {
         currentAnnouncement = nil
+        
+        // TODO: run closure here really quick before moving onto the next announcement
+        
         if let nextAnnouncement = self.nextAnnouncement {
             self.nextAnnouncement = nil
             announce(announcement: nextAnnouncement)
@@ -183,6 +186,9 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didCancel utterance: AVSpeechUtterance) {
         currentAnnouncement = nil
+        
+        // TODO: run closure here really quick before moving onto the next announcement
+        
         if let nextAnnouncement = self.nextAnnouncement {
             self.nextAnnouncement = nil
             announce(announcement: nextAnnouncement)

@@ -85,22 +85,23 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// runs voiceovers at the beginning to get the user acquainted with the app
     func appIntroduction() {
-        introText = """
-                   This app uses the front facing camera to check your makeup. \
-                   For the app to work properly, make sure you don't have makeup \
-                   on when you first open the app. \
-                   First, you'll be guided to center your face in the screen. \
-                   When you're centered, a success sound will play and you'll go \
-                   into the next section of the app where three images will be taken \
-                   of your face with no makeup on. \
-                   Once those images are successfully taken, a success sound will \
-                   play and you can then apply makeup. When you're done applying \
-                   makeup, press the button that says "Check your makeup", located \
-                   at the bottom of the screen. It will prompt you to gather another \
-                   set of face images. \
-                   When you're done listening to this, press the "Done" button at the \
-                   bottom of the screen.
-                   """
+        introText = "b"
+//        introText = """
+//                   This app uses the front facing camera to check your makeup. \
+//                   For the app to work properly, make sure you don't have makeup \
+//                   on when you first open the app. \
+//                   First, you'll be guided to center your face in the screen. \
+//                   When you're centered, a success sound will play and you'll go \
+//                   into the next section of the app where three images will be taken \
+//                   of your face with no makeup on. \
+//                   Once those images are successfully taken, a success sound will \
+//                   play and you can then apply makeup. When you're done applying \
+//                   makeup, press the button that says "Check your makeup", located \
+//                   at the bottom of the screen. It will prompt you to gather another \
+//                   set of face images. \
+//                   When you're done listening to this, press the "Done" button at the \
+//                   bottom of the screen.
+//                   """
         
         self.soundHelper.announce(announcement: introText)
     }
@@ -388,13 +389,16 @@ extension ARSessionManager: ARSCNViewDelegate {
         }
         /// this is for the face UV unwrapping. Unsure if its needed
         let node = SCNNode(geometry: scnFaceGeometry)
-        scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)   // this line of code works with other images, not sure about this MTLTexture tho. Perhaps need to convert it to Image - test this current code out!!
+        
         return node
     }
     
     
     /// this makes the mesh mask move as you blink, open mouth, etc.
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        
+        scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)
+        // UIImage(named: "wireframeTexture")! //
         
         /// check to make sure the face anchor and geometry being updated are the correct types (`ARFaceAnchor` and `ARSCNFaceGeometry`)
         guard let faceAnchor = anchor as? ARFaceAnchor,
@@ -461,16 +465,30 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         
-        
-        // variable to say if the face is not normal. if this variable changes, _____
-        // doesn't go back to normal after 5 seconds
-        
         facePosition = CheckFaceHelper.shared.checkPositionOfFace(transformMatrix: faceAnchorTransform)
         faceOrientation = CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform)
         
         
         /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
         scnFaceGeometry.update(from: faceAnchor.geometry)
+        
+//        print("STARTING FRAME")
+//        print("[")
+//        for vertex in faceAnchor.geometry.vertices {
+//            let vertexInWorldFrame = faceAnchor.transform * simd_float4(vertex, 1.0)
+//            let vertexInCameraFrame = frame.camera.transform.inverse * vertexInWorldFrame
+////            let pixelOfAnchor = frame.camera.projectionMatrix * vertexInCameraFrame
+////            let pixels = frame.camera.intrinsics * simd_float3(pixelOfAnchor.x, pixelOfAnchor.y, pixelOfAnchor.z)
+//            let vertexInPinholeConvention = simd_float4(vertexInCameraFrame.x, -vertexInCameraFrame.y, -vertexInCameraFrame.z, vertexInCameraFrame.w)
+//            let pixels = frame.camera.intrinsics * simd_float3(vertexInPinholeConvention.x, vertexInPinholeConvention.y, vertexInPinholeConvention.z)
+//
+//            print("[\(pixels.x/pixels.z), \(pixels.y/pixels.z)],")
+//        }
+//        self.exportTextureMap(fileName: "test")
+//
+//        print("]")
+//        let image = frame.capturedImage
+        
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
         
         // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)

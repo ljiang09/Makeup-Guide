@@ -129,7 +129,6 @@ class FaceTextureGenerator {
     }
     
     
-    // MARK: THIS IS THE TEXTURE I WANT TO SAVE! just create an instance of this object and save it
     // Captured face texture for UV map
     public var texture: MTLTexture {
         renderTarget        // = device.makeTexture(descriptor: FaceTextureGenerator.renderTargetDescriptor(textureSize: textureSize))!
@@ -224,8 +223,7 @@ class FaceTextureGenerator {
         let height = CVPixelBufferGetHeightOfPlane(pixelBuffer, planeIndex)
         
         var texture: CVMetalTexture? = nil
-        let status = CVMetalTextureCacheCreateTextureFromImage(nil, cameraImageTextureCache, pixelBuffer, nil, pixelFormat,
-                                                               width, height, planeIndex, &texture)
+        let status = CVMetalTextureCacheCreateTextureFromImage(nil, cameraImageTextureCache, pixelBuffer, nil, pixelFormat, width, height, planeIndex, &texture)
         
         if status != kCVReturnSuccess {
             print("Error \(status)")

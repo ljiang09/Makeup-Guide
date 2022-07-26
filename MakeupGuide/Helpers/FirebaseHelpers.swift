@@ -35,6 +35,8 @@ class FirebaseHelpers {
         
         /// store the image at the specified file location
         ref.putData(imageData, metadata: metadata)
+        
+        print(metadata)
     }
     
     
