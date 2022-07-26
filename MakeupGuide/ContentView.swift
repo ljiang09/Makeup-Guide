@@ -18,6 +18,8 @@ struct ContentView : View {
     @ObservedObject var sessionData = LogSessionData.shared
     @State private var showingCheckImage = false
     
+    @State var voiceoverOn: Bool = true
+    
     var body: some View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
@@ -27,19 +29,43 @@ struct ContentView : View {
                     HStack {
                         Spacer()
                         
+//                        Button(action: {
+//                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+//                                print("voiceover is now false")
+//                                UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+//                                // TODO: state that announcements are on
+//                            } else {
+//                                print("voiceover is now true")
+//                                UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+//                                // TODO: state that announcements are off
+//                            }
+//                        }) {
+//                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+//                                Text("turn voiceover off")
+//                            } else {
+//                                Text("turn voiceover on")
+//                            }
+//                        }
+//                        .padding()
+                        
                         Button(action: {
-                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
-                                UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+                            if (voiceoverOn) {
+                                print("voiceover is now false")
+                                voiceoverOn = false
+                                // TODO: state that announcements are on
                             } else {
-                                UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+                                print("voiceover is now true")
+                                voiceoverOn = true
+                                // TODO: state that announcements are off
                             }
                         }) {
-                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                            if (voiceoverOn) {
                                 Text("turn voiceover off")
                             } else {
                                 Text("turn voiceover on")
                             }
                         }
+                        .padding()
                     }
                     
                     Spacer()

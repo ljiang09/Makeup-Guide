@@ -390,6 +390,9 @@ extension ARSessionManager: ARSCNViewDelegate {
         /// this is for the face UV unwrapping. Unsure if its needed
         let node = SCNNode(geometry: scnFaceGeometry)
         
+        // note that this doesn't actually generate an overlay since it's the first frame. if you want to see the overlay of your UV textured face, pace this line in the other delegate function
+        scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)
+        
         return node
     }
     
@@ -397,8 +400,7 @@ extension ARSessionManager: ARSCNViewDelegate {
     /// this makes the mesh mask move as you blink, open mouth, etc.
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
         
-        scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)
-        // UIImage(named: "wireframeTexture")! //
+        //scnFaceGeometry.firstMaterial?.diffuse.contents = textureToImage(faceUvGenerator.texture)
         
         /// check to make sure the face anchor and geometry being updated are the correct types (`ARFaceAnchor` and `ARSCNFaceGeometry`)
         guard let faceAnchor = anchor as? ARFaceAnchor,
