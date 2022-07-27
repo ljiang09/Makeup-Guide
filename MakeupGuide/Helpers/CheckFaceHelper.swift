@@ -39,12 +39,13 @@ class CheckFaceHelper {
                 && (transformMatrix[2][0] < -0.5)) {
                 return tiltedBackward
             }
-            // TODO: debug this - see if it prints out head on when it's supposed to. also change the AR manager code so that it distinguishes between `blank` and `head on`??
-            if ((transformMatrix[0][1] < th1) && (-th2...th2 ~= transformMatrix[0][2]) && (-th2...th2 ~= transformMatrix[2][1]) && (transformMatrix[1][0] > -th1) && (-0.5...th3 ~= transformMatrix[1][2]) && (-0.5...th3 ~= transformMatrix[2][0])) {
-                print("returning head on string..")
-                return headOn
-            }
         }
+        if ((transformMatrix[0][1] > th1) && (-th2...th2 ~= transformMatrix[0][2])
+            && (-th2...th2 ~= transformMatrix[2][1]) && (transformMatrix[1][0] < -th1)
+            && (-th3...th3 ~= transformMatrix[1][2]) && (-th3...th3 ~= transformMatrix[2][0])) {
+            return headOn
+        }
+        
         
         return "blank"
     }
