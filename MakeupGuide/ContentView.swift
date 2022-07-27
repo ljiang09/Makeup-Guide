@@ -98,7 +98,7 @@ struct ContentView : View {
             Button(action: {
                 if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
                     arManager.interruptVoiceover()
-                    soundHelpers.announce(announcement: "Voiceover is off")
+                    soundHelpers.announce(announcement: "Voiceover is off")    // TODO: for some reason this isn't working, when i added the `soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)` below it broke
                     
                     voiceoverOn = false
                     UserDefaults.standard.set(false, forKey: "VoiceoversOn")
@@ -106,7 +106,7 @@ struct ContentView : View {
                     voiceoverOn = true
                     UserDefaults.standard.set(true, forKey: "VoiceoversOn")
                     soundHelpers.announce(announcement: "Voiceover is on")
-                    // TODO: announce the current voiceover
+                    soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)
                 }
             }) {
                 if (voiceoverOn) {

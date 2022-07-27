@@ -36,6 +36,8 @@ class SoundHelper: NSObject {
     private var nextAnnouncement: String?           /// The announcement that should be read immediately after this one finishes
     private var announcementRemovalTimer: Timer?    /// times when an announcement should be removed.  These announcements are displayed on the `announcementText` label.
     
+    var latestAnnouncement: String = ""     /// this is used for when the voiceover is toggled on, it starts reading out the last command that was left off on (can't use currentAnnouncement because it' announcing "voiceover on/off"
+    
     private override init() {
         super.init()
         
@@ -99,7 +101,6 @@ class SoundHelper: NSObject {
     func announce(announcement: String) {
         
         // if the user doesn't want voiceovers, skip it
-        print(UserDefaults.standard.bool(forKey: "VoiceoversOn"))
         if (!UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
             return
         }

@@ -103,15 +103,18 @@ class ARSessionManager: NSObject, ObservableObject {
                    """
         
         self.soundHelper.announce(announcement: introText)
+        self.soundHelper.latestAnnouncement = introText
     }
     
     func interruptVoiceover() {
         self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
+        // clear the variables in there?? or somethign
     }
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
         self.soundHelper.announce(announcement: "This app uses the front facing camera. Follow the voiceover prompts. Hold or prop up your phone at arms length for best results.")
+        self.soundHelper.latestAnnouncement = "This app uses the front facing camera. Follow the voiceover prompts. Hold or prop up your phone at arms length for best results."
         
         self.fireTimer4()
         self.fireTimer5()
@@ -128,6 +131,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.isNeckImageShowing = true
                     self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                    self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
                     
                     /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
                     self.firetimer2()
@@ -149,13 +153,16 @@ class ARSessionManager: NSObject, ObservableObject {
                 completion()
             } else {
                 self.soundHelper.announce(announcement: "please position your face in the screen")
+                self.soundHelper.latestAnnouncement = "please position your face in the screen"
             }
             
             if (self.facePosition != "blank") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                     self.soundHelper.announce(announcement: self.facePosition)
+                    self.soundHelper.latestAnnouncement = self.facePosition
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         self.soundHelper.announce(announcement: self.faceOrientation)
+                        self.soundHelper.latestAnnouncement = self.faceOrientation
                     }
                 }
             }
@@ -224,19 +231,23 @@ class ARSessionManager: NSObject, ObservableObject {
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
         self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+        self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
         
         /// state user face and orientation if the face is in the screen
         if (facePosition != "blank") {
             // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 self.soundHelper.announce(announcement: self.facePosition)
+                self.soundHelper.latestAnnouncement = self.facePosition
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     self.soundHelper.announce(announcement: self.faceOrientation)
+                    self.soundHelper.latestAnnouncement = self.faceOrientation
                 }
             }
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 self.soundHelper.announce(announcement: "please position your face in the screen")
+                self.soundHelper.latestAnnouncement = "please position your face in the screen"
             }
         }
     }
@@ -245,8 +256,10 @@ class ARSessionManager: NSObject, ObservableObject {
         /// check the face orientation and speak face is rotated and such
         if facePosition != "blank" {
             self.soundHelper.announce(announcement: facePosition)
+            self.soundHelper.latestAnnouncement = facePosition
         } else if faceOrientation != "blank" {
             self.soundHelper.announce(announcement: faceOrientation)
+            self.soundHelper.latestAnnouncement = faceOrientation
         }
     }
     
@@ -266,6 +279,7 @@ class ARSessionManager: NSObject, ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.isNeckImageShowing = true
             self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+            self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
             self.firetimer2()
         }
         
