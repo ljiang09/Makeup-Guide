@@ -33,7 +33,6 @@ struct ContentView : View {
                         Button(action: {
                             if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
                                 arManager.interruptVoiceover()
-                                
                                 soundHelpers.announce(announcement: "Voiceover is off")
                                 
                                 voiceoverOn = false
@@ -41,25 +40,26 @@ struct ContentView : View {
                             } else {
                                 voiceoverOn = true
                                 UserDefaults.standard.set(true, forKey: "VoiceoversOn")
-                                // TODO: state that announcements are on
+                                soundHelpers.announce(announcement: "Voiceover is on")
                             }
                         }) {
                             if (voiceoverOn) {
-                                Text("turn voiceover off")
+                                Text("Turn voiceover off")
                                     .foregroundColor(.black)
                                     .padding()
                                     .background(RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(red: 200/255, green: 200/255, blue: 200/255))
                                     )
                             } else {
-                                Text("turn voiceover on")
+                                Text("Turn voiceover on")
                                     .foregroundColor(.black)
                                     .padding()
                                     .background(RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(red: 80/255, green: 1, blue: 50/255))
                                     )
                             }
                         }
+                        .padding()
                     }
                     
                     if (voiceoverOn) {
