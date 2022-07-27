@@ -31,7 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         /// at the start of the app session, set/reset the SessionID to be used in posting images to firebase
         UserDefaults.standard.set(UUID().uuidString, forKey: "SessionID")
-        UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+        
+        if (UserDefaults.standard.object(forKey: "VoiceoversOn") == nil) {
+            UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+        }
         
         return true
     }

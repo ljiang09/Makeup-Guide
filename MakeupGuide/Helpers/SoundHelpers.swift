@@ -99,6 +99,7 @@ class SoundHelper: NSObject {
     func announce(announcement: String) {
         
         // if the user doesn't want voiceovers, skip it
+        print(UserDefaults.standard.bool(forKey: "VoiceoversOn"))
         if (!UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
             return
         }

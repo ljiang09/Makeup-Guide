@@ -15,6 +15,7 @@ struct ContentView : View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     @ObservedObject var arManager = ARSessionManager.shared
+    var soundHelpers = SoundHelper.shared
     @ObservedObject var sessionData = LogSessionData.shared
     @State private var showingCheckImage = false
     
@@ -31,31 +32,44 @@ struct ContentView : View {
                         
                         Button(action: {
                             if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                                arManager.interruptVoiceover()
+                                
+                                soundHelpers.announce(announcement: "Voiceover is off")
+                                
                                 voiceoverOn = false
                                 UserDefaults.standard.set(false, forKey: "VoiceoversOn")
-                                // TODO: state that announcements are on
                             } else {
                                 voiceoverOn = true
                                 UserDefaults.standard.set(true, forKey: "VoiceoversOn")
-                                // TODO: state that announcements are off
+                                // TODO: state that announcements are on
                             }
-//                            print("voiceover is now", UserDefaults.standard.bool(forKey: "VoiceoversOn"))
                         }) {
                             if (voiceoverOn) {
                                 Text("turn voiceover off")
+                                    .foregroundColor(.black)
+                                    .padding()
+                                    .background(RoundedRectangle(cornerRadius: 10)
+                                        .foregroundColor(.white)
+                                    )
                             } else {
                                 Text("turn voiceover on")
+                                    .foregroundColor(.black)
+                                    .padding()
+                                    .background(RoundedRectangle(cornerRadius: 10)
+                                        .foregroundColor(.white)
+                                    )
                             }
                         }
-                        .padding()
                     }
                     
-                    Spacer()
-                    
-                    Text(arManager.introText)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.white)
-                        .background(Color.black.opacity(0.5))
+                    if (voiceoverOn) {
+                        Spacer()
+                        
+                        Text(arManager.introText)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.white)
+                            .background(Color.black.opacity(0.5))
+                    }
                     
                     Spacer()
                     
