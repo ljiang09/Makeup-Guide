@@ -52,6 +52,9 @@ class ARSessionManager: NSObject, ObservableObject {
     var rotatedLeftImgDirectory2: URL!
     var rotatedRightImgDirectory2: URL!
     
+    /// toggled every time a set of intro text
+    @Published var isIntroTextShowing: Bool = true
+    var introText: String = ""
     
     private override init() {
         isButtonShowing = false
@@ -74,32 +77,79 @@ class ARSessionManager: NSObject, ObservableObject {
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
         
+        
+        appIntroduction()
+        
+    }
+    
+    /// runs voiceovers at the beginning to get the user acquainted with the app
+    func appIntroduction() {
+    introText = """
+               This app uses the front facing camera to check your makeup. \
+               For the app to work properly, make sure you don't have makeup \
+               on when you first open the app. \
+               First, you'll be guided to center your face in the screen. \
+               When you're centered, a success sound will play and you'll go \
+               into the next section of the app where three images will be taken \
+               of your face with no makeup on. \
+               Once those images are successfully taken, a success sound will \
+               play and you can then apply makeup. When you're done applying \
+               makeup, press the button that says "Check your makeup", located \
+               at the bottom of the screen. It will prompt you to gather another \
+               set of face images. \
+               When you're done listening to this, press the "Done" button at the \
+               bottom of the screen.
+               """
+        
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: introText)
+        }
+        else {
+            let audioSession = AVAudioSession.sharedInstance()
+            
+            do {
+                // make the audio play even if the ringer is off
+                try audioSession.setCategory(AVAudioSession.Category.playback)
+                try audioSession.setActive(true)
+                
+                let utterance = AVSpeechUtterance(string: introText)
+                utterance.rate = 0.5
+                SoundHelper.shared.synthesizer.speak(utterance)
+            } catch {
+                print("Unexpected error announcing something using AVSpeechEngine!")
+            }
+        }
+    }
+    
+    func interruptVoiceover() {
+        SoundHelper.shared.synthesizer.stopSpeaking(at: .immediate)
+    }
+    
+    /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
+    func runAtBeginning2() {
         fireTimer4()
         fireTimer5()
         
-        /// after half a second, call function to check whether the user's face is positioned well in the screen.
-        /// once the face is centered, run the next phase of face rotation/snapshot gathering
-        /// note: "centering the face" (aka running the closure) also makes the code collect a head on image which is cool
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.checkFaceUntilRepositioned(completion: {
-                SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
-                
-                self.isCheckImageShowing = true
-                /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.isCheckImageShowing = false
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        self.isNeckImageShowing = true
-                        SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
-                        
-                        /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
-                        self.firetimer2()
-                    }
-                }
-            })
-        }
+        // TODO: here, remind them to use the front facing camera to see how the thing works
         
+        self.checkFaceUntilRepositioned(completion: {
+            SoundHelper.shared.playSound(soundName: "SuccessSound", dotExt: "wav")
+            // TODO: run voiceover saying "face is centered"
+            
+            self.isCheckImageShowing = true
+            /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.isCheckImageShowing = false
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.isNeckImageShowing = true
+                    SoundHelper.shared.announce(announcement: SoundHelper.shared.rotateHeadInstructions)
+                    
+                    /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                    self.firetimer2()
+                }
+            }
+        })
     }
     
     /// this function is intended to run at the beginning of the app lifecycle
@@ -109,9 +159,12 @@ class ARSessionManager: NSObject, ObservableObject {
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
 //        print("Timer 1 fired!")
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
+            // TODO: change timer value (or add another timer) to check face centered more often than every 3 seconds
             if (self.facePosition == "Face is centered") {
                 timer1.invalidate()
                 completion()
+            } else {
+                SoundHelper.shared.announce(announcement: "please position your face in the screen")
             }
             
             if (self.facePosition != "blank") {
@@ -122,11 +175,11 @@ class ARSessionManager: NSObject, ObservableObject {
                     }
                 }
             }
-            else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
-                }
-            }
+//            else {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+//                    SoundHelper.shared.announce(announcement: "please position your face in the screen")
+//                }
+//            }
         })
         timer1.tolerance = 0.2
         RunLoop.current.add(timer1, forMode: .default)

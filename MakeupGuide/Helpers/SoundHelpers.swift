@@ -39,12 +39,14 @@ class SoundHelper: NSObject {
     
     private override init() {
         super.init()
+        
+        synthesizer.delegate = self
+        
         // create listeners to ensure that the isReadingAnnouncement flag is reset properly
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { (notification) -> Void in
             self.currentAnnouncement = nil
         }
         
-        synthesizer.delegate = self
         NotificationCenter.default.addObserver(forName: UIAccessibility.announcementDidFinishNotification, object: nil, queue: nil) { (notification) -> Void in
             self.currentAnnouncement = nil
             if let nextAnnouncement = self.nextAnnouncement {
@@ -129,6 +131,8 @@ class SoundHelper: NSObject {
                 try audioSession.setActive(true)
                 
                 let utterance = AVSpeechUtterance(string: announcement)
+                // change the utterance to be the local accent
+                utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.languageCode)
                 utterance.rate = 0.5
 //                utterance.volume = 0.5
                 currentAnnouncement = announcement
@@ -167,6 +171,9 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
             self.nextAnnouncement = nil
             announce(announcement: nextAnnouncement)
         }
+        
+        // send some kind of notification to the ar session manager.. maybe run a function in there?
+        
     }
     /// Called when an utterance is canceled.  We implement this function so that we can keep track of
     /// whether or not an announcement is currently being read to the user.

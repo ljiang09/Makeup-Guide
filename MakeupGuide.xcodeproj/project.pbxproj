@@ -19,9 +19,10 @@
 		C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4675A5E287C6F3D008BE643 /* LogSessionData.swift */; };
 		C475427428769E7800A5C948 /* SuccessSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C475427328769E7800A5C948 /* SuccessSound.wav */; };
 		C4B0B6CB288EF4840055B375 /* TimerControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B0B6CA288EF4840055B375 /* TimerControllers.swift */; };
+		C4ABB1DA287F09B0009A3F0F /* CompareFaceTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */; };
+		C4B0B6B828885C330055B375 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C4B0B6BA28885C330055B375 /* Localizable.strings */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
-		C4E50885285912A60020EF3D /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = C4E50884285912A60020EF3D /* Experience.rcproject */; };
 		C4E50887285912AA0020EF3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E50886285912AA0020EF3D /* Assets.xcassets */; };
 		C4E5088A285912AA0020EF3D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E50889285912AA0020EF3D /* Preview Assets.xcassets */; };
 		C4E50894285912AA0020EF3D /* MakeupGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50893285912AA0020EF3D /* MakeupGuideTests.swift */; };
@@ -60,10 +61,13 @@
 		C4675A5E287C6F3D008BE643 /* LogSessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSessionData.swift; sourceTree = "<group>"; };
 		C475427328769E7800A5C948 /* SuccessSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SuccessSound.wav; sourceTree = "<group>"; };
 		C4B0B6CA288EF4840055B375 /* TimerControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControllers.swift; sourceTree = "<group>"; };
+		C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareFaceTextures.swift; sourceTree = "<group>"; };
+		C4B0B6B928885C330055B375 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C4B0B6BB28885C690055B375 /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		C4B0B6BC28885CAD0055B375 /* en-AU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-AU"; path = "en-AU.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C4E50884285912A60020EF3D /* Experience.rcproject */ = {isa = PBXFileReference; lastKnownFileType = file.rcproject; path = Experience.rcproject; sourceTree = "<group>"; };
 		C4E50886285912AA0020EF3D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C4E50889285912AA0020EF3D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C4E5088F285912AA0020EF3D /* MakeupGuideTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MakeupGuideTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,8 +116,17 @@
 				C44E80702866383C00550CE8 /* ARControllerTexture.swift */,
 				C44E80722866386500550CE8 /* TextureToImage.swift */,
 				C44E8074286641B500550CE8 /* faceTexture.metal */,
+				C4ABB1D8287F098F009A3F0F /* FaceTextureComparison */,
 			);
 			path = FaceTexture;
+			sourceTree = "<group>";
+		};
+		C4ABB1D8287F098F009A3F0F /* FaceTextureComparison */ = {
+			isa = PBXGroup;
+			children = (
+				C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */,
+			);
+			path = FaceTextureComparison;
 			sourceTree = "<group>";
 		};
 		C4E50874285912A50020EF3D = {
@@ -139,7 +152,6 @@
 		C4E5087F285912A60020EF3D /* MakeupGuide */ = {
 			isa = PBXGroup;
 			children = (
-				C4E50884285912A60020EF3D /* Experience.rcproject */,
 				C4E50880285912A60020EF3D /* AppDelegate.swift */,
 				C4E50882285912A60020EF3D /* ContentView.swift */,
 				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
@@ -187,6 +199,7 @@
 				C435EB482878B7AB007BA89B /* FirebaseHelpers.swift */,
 				C4675A5E287C6F3D008BE643 /* LogSessionData.swift */,
 				C4B0B6CA288EF4840055B375 /* TimerControllers.swift */,
+				C4B0B6BA28885C330055B375 /* Localizable.strings */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -290,6 +303,8 @@
 			knownRegions = (
 				en,
 				Base,
+				"en-GB",
+				"en-AU",
 			);
 			mainGroup = C4E50874285912A50020EF3D;
 			packageReferences = (
@@ -311,6 +326,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4B0B6B828885C330055B375 /* Localizable.strings in Resources */,
 				C4E5088A285912AA0020EF3D /* Preview Assets.xcassets in Resources */,
 				C435EB4B2878B84B007BA89B /* GoogleService-Info.plist in Resources */,
 				C475427428769E7800A5C948 /* SuccessSound.wav in Resources */,
@@ -348,10 +364,10 @@
 				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
 				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
-				C4E50885285912A60020EF3D /* Experience.rcproject in Sources */,
 				C4E508AD28591FB50020EF3D /* VCGeneralHelpers.swift in Sources */,
 				C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */,
 				C44E80732866386500550CE8 /* TextureToImage.swift in Sources */,
+				C4ABB1DA287F09B0009A3F0F /* CompareFaceTextures.swift in Sources */,
 				C44E8075286641B500550CE8 /* faceTexture.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -388,11 +404,25 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		C4B0B6BA28885C330055B375 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C4B0B6B928885C330055B375 /* en */,
+				C4B0B6BB28885C690055B375 /* en-GB */,
+				C4B0B6BC28885CAD0055B375 /* en-AU */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		C4E508A1285912AA0020EF3D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -453,6 +483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
