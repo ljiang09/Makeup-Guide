@@ -46,7 +46,6 @@ private func makeImage(for texture: MTLTexture) -> CGImage? {
 
 
 /// this is the function that converts the texture to an image
-/// I don't think i'll need to convert it to an image.. I think leaving it as a texture should be OK in my software
 public func textureToImage(_ texture: MTLTexture) -> UIImage? {
     if let image = makeImage(for: texture) {
         return UIImage(cgImage: image)

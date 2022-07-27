@@ -18,12 +18,38 @@ struct ContentView : View {
     @ObservedObject var sessionData = LogSessionData.shared
     @State private var showingCheckImage = false
     
+    @State var voiceoverOn: Bool = UserDefaults.standard.bool(forKey: "VoiceoversOn")  // need this in tandem with the user defaults because otherwise the UI doesn't update
+    
     var body: some View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
             if (arManager.isIntroTextShowing) {
                 VStack {
+                    HStack {
+                        Spacer()
+                        
+                        Button(action: {
+                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                                voiceoverOn = false
+                                UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+                                // TODO: state that announcements are on
+                            } else {
+                                voiceoverOn = true
+                                UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+                                // TODO: state that announcements are off
+                            }
+//                            print("voiceover is now", UserDefaults.standard.bool(forKey: "VoiceoversOn"))
+                        }) {
+                            if (voiceoverOn) {
+                                Text("turn voiceover off")
+                            } else {
+                                Text("turn voiceover on")
+                            }
+                        }
+                        .padding()
+                    }
+                    
                     Spacer()
                     
                     Text(arManager.introText)

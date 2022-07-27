@@ -122,14 +122,36 @@ class FaceTextureGenerator {
                                         start: self.normalBuffer.contents(),
                                         count: normalSource.vectorCount * MemoryLayout<SIMD3<Float>>.stride))
         
+        // TODO: iterate through MTLBuffer of uvBuffer.contents and see if the uv coordinates are changing
+        
         let uvSource = face.sources(for: .texcoord).first!
         uvSource.data.copyBytes(to: UnsafeMutableRawBufferPointer(
                                         start: self.uvBuffer.contents(),
                                         count: uvSource.vectorCount * MemoryLayout<SIMD2<Float>>.stride))
+
+       // var vertexPointer = positionBuffer.contents().advanced(by: 0)
+        //let totalElements = positionBuffer.length / MemoryLayout<SIMD3<Float>>.stride
+//        print("[")
+//        for _ in 0..<totalElements {
+//
+//               let vertex = vertexPointer.assumingMemoryBound(to: SIMD3<Float>.self).pointee
+//               vertexPointer = vertexPointer.advanced(by: MemoryLayout<SIMD3<Float>>.stride)
+//
+//            print("[\(vertex.x), \(vertex.y), \(vertex.z)],")
+//        }
+//        print("]")
+//        print("test")
+        //
+//        let bufferPointer = UnsafeRawBufferPointer(start: self.uvBuffer.contents(), count: uvSource.vectorCount * MemoryLayout<SIMD2<Float>>.stride)
+//
+//        for value in bufferPointer {
+//            print(value)
+//        }
+//        bufferPointer.deallocate()
+//        let bufferPointer = UnsafeMutablePointer<SIMD2<Float>>(mutating: bufferPointer)
     }
     
     
-    // MARK: THIS IS THE TEXTURE I WANT TO SAVE! just create an instance of this object and save it
     // Captured face texture for UV map
     public var texture: MTLTexture {
         renderTarget        // = device.makeTexture(descriptor: FaceTextureGenerator.renderTargetDescriptor(textureSize: textureSize))!
@@ -224,8 +246,7 @@ class FaceTextureGenerator {
         let height = CVPixelBufferGetHeightOfPlane(pixelBuffer, planeIndex)
         
         var texture: CVMetalTexture? = nil
-        let status = CVMetalTextureCacheCreateTextureFromImage(nil, cameraImageTextureCache, pixelBuffer, nil, pixelFormat,
-                                                               width, height, planeIndex, &texture)
+        let status = CVMetalTextureCacheCreateTextureFromImage(nil, cameraImageTextureCache, pixelBuffer, nil, pixelFormat, width, height, planeIndex, &texture)
         
         if status != kCVReturnSuccess {
             print("Error \(status)")
