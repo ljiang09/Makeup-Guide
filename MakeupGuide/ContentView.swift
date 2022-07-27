@@ -10,7 +10,7 @@ import SwiftUI
 import SceneKit
 import ARKit
 
-// is there a way to call the shared instance of the manager, inside the manager class? 
+
 struct ContentView : View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
@@ -27,40 +27,7 @@ struct ContentView : View {
             
             if (arManager.isIntroTextShowing) {
                 VStack {
-                    HStack {
-                        Spacer()
-                        
-                        Button(action: {
-                            if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
-                                arManager.interruptVoiceover()
-                                soundHelpers.announce(announcement: "Voiceover is off")
-                                
-                                voiceoverOn = false
-                                UserDefaults.standard.set(false, forKey: "VoiceoversOn")
-                            } else {
-                                voiceoverOn = true
-                                UserDefaults.standard.set(true, forKey: "VoiceoversOn")
-                                soundHelpers.announce(announcement: "Voiceover is on")
-                            }
-                        }) {
-                            if (voiceoverOn) {
-                                Text("Turn voiceover off")
-                                    .foregroundColor(.black)
-                                    .padding()
-                                    .background(RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(Color(red: 200/255, green: 200/255, blue: 200/255))
-                                    )
-                            } else {
-                                Text("Turn voiceover on")
-                                    .foregroundColor(.black)
-                                    .padding()
-                                    .background(RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(Color(red: 80/255, green: 1, blue: 50/255))
-                                    )
-                            }
-                        }
-                        .padding()
-                    }
+                    Spacer()
                     
                     if (voiceoverOn) {
                         Spacer()
@@ -127,6 +94,39 @@ struct ContentView : View {
                     .frame(width: 200, height: 200)
                     .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
             }
+            
+            Button(action: {
+                if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+                    arManager.interruptVoiceover()
+                    soundHelpers.announce(announcement: "Voiceover is off")
+                    
+                    voiceoverOn = false
+                    UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+                } else {
+                    voiceoverOn = true
+                    UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+                    soundHelpers.announce(announcement: "Voiceover is on")
+                    // TODO: announce the current voiceover
+                }
+            }) {
+                if (voiceoverOn) {
+                    Text("Turn voiceover off")
+                        .foregroundColor(.black)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 10)
+                            .foregroundColor(Color(red: 200/255, green: 200/255, blue: 200/255))
+                        )
+                } else {
+                    Text("Turn voiceover on")
+                        .foregroundColor(.black)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 10)
+                            .foregroundColor(Color(red: 80/255, green: 1, blue: 50/255))
+                        )
+                }
+            }
+            .padding()
+            .position(x: UIScreen.main.bounds.width * 3/4, y: UIScreen.main.bounds.height / 15)
         }
     }
     
