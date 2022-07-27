@@ -85,23 +85,22 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// runs voiceovers at the beginning to get the user acquainted with the app
     func appIntroduction() {
-        introText = "b"
-//        introText = """
-//                   This app uses the front facing camera to check your makeup. \
-//                   For the app to work properly, make sure you don't have makeup \
-//                   on when you first open the app. \
-//                   First, you'll be guided to center your face in the screen. \
-//                   When you're centered, a success sound will play and you'll go \
-//                   into the next section of the app where three images will be taken \
-//                   of your face with no makeup on. \
-//                   Once those images are successfully taken, a success sound will \
-//                   play and you can then apply makeup. When you're done applying \
-//                   makeup, press the button that says "Check your makeup", located \
-//                   at the bottom of the screen. It will prompt you to gather another \
-//                   set of face images. \
-//                   When you're done listening to this, press the "Done" button at the \
-//                   bottom of the screen.
-//                   """
+        introText = """
+                   This app uses the front facing camera to check your makeup. \
+                   For the app to work properly, make sure you don't have makeup \
+                   on when you first open the app. \
+                   First, you'll be guided to center your face in the screen. \
+                   When you're centered, a success sound will play and you'll go \
+                   into the next section of the app where three images will be taken \
+                   of your face with no makeup on. \
+                   Once those images are successfully taken, a success sound will \
+                   play and you can then apply makeup. When you're done applying \
+                   makeup, press the button that says "Check your makeup", located \
+                   at the bottom of the screen. It will prompt you to gather another \
+                   set of face images. \
+                   When you're done listening to this, press the "Done" button at the \
+                   bottom of the screen.
+                   """
         
         self.soundHelper.announce(announcement: introText)
     }
@@ -493,7 +492,7 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
         
-        // collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
+        /// collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
         if (collectingData) {
             sessionData.log(faceGeometry: faceAnchor.geometry)
             
