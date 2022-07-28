@@ -17,7 +17,7 @@ import SwiftUI
 
 class SoundHelper: NSObject {
     static var shared: SoundHelper = SoundHelper()
-    let synthesizer = AVSpeechSynthesizer()     /// this should only be created once because it is memory intensive
+    let synthesizer = Synthesizer.shared     /// this should only be created once because it is memory intensive
     var player: AVAudioPlayer?
     
     /// the voiceover callouts for face positioning
@@ -187,6 +187,8 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     ///   - utterance: the utterance itself
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didFinish utterance: AVSpeechUtterance) {
+        // TODO: after the first time the synthesizer is called, it runs this delegate incorrectly at the beginning of the speech utterance
+        
         currentAnnouncement = nil
         
         if (self.announceCompletion != nil) {
@@ -224,4 +226,8 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
             announce(announcement: nextAnnouncement)
         }
     }
+}
+
+class Synthesizer {
+    static var shared: AVSpeechSynthesizer = AVSpeechSynthesizer()
 }
