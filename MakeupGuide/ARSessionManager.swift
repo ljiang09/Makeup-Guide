@@ -159,7 +159,7 @@ class ARSessionManager: NSObject, ObservableObject {
         
         isTextShowing = true
         
-        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results."
+        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results. Now, we will take three pictures of your face to represent what your face looks like without makeup on. This will later be compared to your face after you apply makeup, to check where you have applied makeup."
         self.soundHelper.latestAnnouncement = announcement
         soundHelper1.announce(announcement: announcement)
     }
@@ -280,47 +280,56 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     /// this fxn is called once per button click
-    public func setGeneratingFaceTextures2(setTo: Bool) {
-        generatingFaceTextures2 = setTo
+    public func setGeneratingFaceTextures2() {
+        let soundHelpers1 = SoundHelper()
         
-        /// start repeating reminders to remind the user to rotate their head
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.isNeckImageShowing = true
-            self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
-            self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
-            self.firetimer2()
-        }
-        
-        
-        /// create a clean slate (as if the button had never been clicked before). reset the face images collected, delete the files that were written to the points
-        faceImagesCollected[3] = false
-        faceImagesCollected[4] = false
-        faceImagesCollected[5] = false
-        
-        if (headOnImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: headOnImgDirectory2)
-                print("deleted Head On 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
+        soundHelpers1.announceCompletion = {
+            self.generatingFaceTextures2 = true
+            
+            /// start repeating reminders to remind the user to rotate their head
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                self.isNeckImageShowing = true
+                self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
+                self.firetimer2()
+            }
+            
+            /// create a clean slate (as if the button had never been clicked before). reset the face images collected, delete the files that were written to the points
+            self.faceImagesCollected[3] = false
+            self.faceImagesCollected[4] = false
+            self.faceImagesCollected[5] = false
+            
+            if (self.headOnImgDirectory2 != nil) {
+                do {
+                    try FileManager.default.removeItem(at: self.headOnImgDirectory2)
+                    print("deleted Head On 2 image")
+                } catch {
+                    print("Could not clear temp folder: \(error)")
+                }
+            }
+            if (self.rotatedLeftImgDirectory2 != nil) {
+                do {
+                    try FileManager.default.removeItem(at: self.rotatedLeftImgDirectory2)
+                    print("deleted rotated left 2 image")
+                } catch {
+                    print("Could not clear temp folder: \(error)")
+                }
+            }
+            if (self.rotatedRightImgDirectory2 != nil) {
+                do {
+                    try FileManager.default.removeItem(at: self.rotatedRightImgDirectory2)
+                    print("deleted rotated right 2 image")
+                } catch {
+                    print("Could not clear temp folder: \(error)")
+                }
             }
         }
-        if (rotatedLeftImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: rotatedLeftImgDirectory2)
-                print("deleted rotated left 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
-        if (rotatedRightImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: rotatedRightImgDirectory2)
-                print("deleted rotated right 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
+        
+        /// announcement before the user collects the second set of 3 images
+        let announcement = "Now that you're done applying makeup, let's take a few more images to compare to the images you took earlier without makeup on."
+        self.soundHelper.latestAnnouncement = announcement
+        soundHelpers1.announce(announcement: announcement)
+        
     }
     
     /// this is called every frame to save the second batch of textures, when the user clicks the button
@@ -461,7 +470,15 @@ extension ARSessionManager: ARSCNViewDelegate {
                     timer2.invalidate()
                     timer2 = nil
                 }
-                firetimer3()
+                
+                let soundHelpers1 = SoundHelper()
+                soundHelpers1.announceCompletion = {
+                    print("done")
+                    self.firetimer3()
+                }
+                let announcement = "Now, apply makeup. Whenever you're done, click the button at the bottom of the screen to check your makeup."
+                self.soundHelper.latestAnnouncement = announcement
+                soundHelpers1.announce(announcement: announcement)
             }
         }
         
@@ -471,7 +488,7 @@ extension ARSessionManager: ARSCNViewDelegate {
             
             saveTextures2()
             
-            /// Finish collecting images. this runs once, right when the images just finished all getting collected
+            /// Finish collecting images. this runs once immediately when the second batch of images just finished all getting collected
             if (faceImagesCollected[3] && faceImagesCollected[4] && faceImagesCollected[5]) {
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
@@ -480,8 +497,22 @@ extension ARSessionManager: ARSCNViewDelegate {
                     self.isNeckImageShowing = false
                     self.generatingFaceTextures2 = false
                 }
-                timer2.invalidate()
-                firetimer3()
+                
+                if (timer2 != nil) {
+                    timer2.invalidate()
+                    timer2 = nil
+                }
+                
+                let soundHelpers1 = SoundHelper()
+                soundHelpers1.announceCompletion = {
+                    print("done")
+                    self.firetimer3()
+                }
+                
+                /// announcement after the second set of face images is collected
+                let announcement = "Now the app will check over your face of makeup. Note that right now (as of 7/18/2022), this part of the app is not implemented yet so this voiceover is just a placeholder."
+                self.soundHelper.latestAnnouncement = announcement
+                soundHelpers1.announce(announcement: announcement)
             }
         }
         

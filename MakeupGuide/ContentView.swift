@@ -60,7 +60,7 @@ struct ContentView : View {
                     Spacer()
                     
                     Button(action: {
-                        arManager.setGeneratingFaceTextures2(setTo: true)
+                        arManager.setGeneratingFaceTextures2()
                         sessionData.log(whichButton: "Check your makeup")
                     }, label: {
                         Text("Check your makeup")
