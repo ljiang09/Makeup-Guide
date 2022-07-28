@@ -53,9 +53,8 @@ class ARSessionManager: NSObject, ObservableObject {
     var rotatedLeftImgDirectory2: URL!
     var rotatedRightImgDirectory2: URL!
     
-    /// toggled every time a set of intro text
-    @Published var isIntroTextShowing: Bool = true
-    var introText: String = ""
+    /// toggled every time a long voiceover is read and needs to be displayed as text on the screen
+    @Published var isTextShowing: Bool = false
     
     /// this prevents the face collection from occurring during the intro text and the other beginning sections of the app
     var readyToCollectFaceImages: Bool = false
@@ -88,36 +87,45 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// runs voiceovers at the beginning to get the user acquainted with the app
     func appIntroduction() {
-        introText = """
-                   This app uses the front facing camera to check your makeup. \
-                   For the app to work properly, make sure you don't have makeup \
-                   on when you first open the app. \
-                   First, you'll be guided to center your face in the screen. \
-                   When you're centered, a success sound will play and you'll go \
-                   into the next section of the app where three images will be taken \
-                   of your face with no makeup on. \
-                   Once those images are successfully taken, a success sound will \
-                   play and you can then apply makeup. When you're done applying \
-                   makeup, press the button that says "Check your makeup", located \
-                   at the bottom of the screen. It will prompt you to gather another \
-                   set of face images. \
-                   When you're done listening to this, press the "Done" button at the \
-                   bottom of the screen.
-                   """
+        let soundHelpers1 = SoundHelper()
+        let introText = """
+                        This app uses the front facing camera to check your makeup. \
+                        For the app to work properly, make sure you don't have makeup \
+                        on when you first open the app. \
+                        First, you'll be guided to center your face in the screen. \
+                        When you're centered, a success sound will play and you'll go \
+                        into the next section of the app where three images will be taken \
+                        of your face with no makeup on. \
+                        Once those images are successfully taken, a success sound will \
+                        play and you can then apply makeup. When you're done applying \
+                        makeup, press the button that says "Check your makeup", located \
+                        at the bottom of the screen. It will prompt you to gather another \
+                        set of face images. \
+                        When you're done listening to this, press the "Done" button at the \
+                        bottom of the screen.
+                        """
+        
+        isTextShowing = true
+        
+        soundHelpers1.announceCompletion = {
+            self.isTextShowing = false
+            self.runAtBeginning2()
+        }
         
         self.soundHelper.latestAnnouncement = introText // TODO: refactor the announce() function to take in a bool stating whether it should be considered the latest announcement (instead of this bs)
-        self.soundHelper.announce(announcement: introText)
+        soundHelpers1.announce(announcement: introText)
     }
     
     func interruptVoiceover() {
         self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
-        // clear the variables in there?? or somethign
+        isTextShowing = false
     }
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
         let soundHelper1 = SoundHelper()
         soundHelper1.announceCompletion = {
+            self.isTextShowing = false
             self.fireTimer4()
             self.fireTimer5()
             
@@ -149,14 +157,14 @@ class ARSessionManager: NSObject, ObservableObject {
             })
         }
         
-        let announcement1 = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results."
-        self.soundHelper.latestAnnouncement = announcement1
-        soundHelper1.announce(announcement: announcement1)
+        isTextShowing = true
+        
+        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results."
+        self.soundHelper.latestAnnouncement = announcement
+        soundHelper1.announce(announcement: announcement)
     }
     
     /// this function is intended to run at the beginning of the app lifecycle
-    /// it is also optionally called whenever the user's face is continually not centered
-    ///
     /// it continually checks the face position until the face is centered and then runs the closure
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
         let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
@@ -193,7 +201,6 @@ class ARSessionManager: NSObject, ObservableObject {
             self.ontimer2Reset()
         })
         timer2.tolerance = 0.4
-        
         RunLoop.current.add(timer2, forMode: .default)
     }
     
@@ -203,7 +210,6 @@ class ARSessionManager: NSObject, ObservableObject {
             self.ontimer3Reset()
         })
         timer3.tolerance = 0.1
-        
         RunLoop.current.add(timer3, forMode: .default)
     }
     
@@ -212,50 +218,46 @@ class ARSessionManager: NSObject, ObservableObject {
             self.collectingData = true
         })
         timer4.tolerance = 0.05
-        
         RunLoop.current.add(timer4, forMode: .default)
     }
     
+    /// every 10 seconds, send analytics to firebase
     func fireTimer5() {
-        print("timer 5 fired")
         var counter: Int = 0
         timer5 = Timer(fire: Date(), interval: 10, repeats: true, block: { _ in
             /// don't send data right when the app starts - it'll be blank
             if (counter != 0) {
                 FirebaseHelpers.uploadSessionLog(int: counter)
-//                print("uploded to firebase")
             }
             counter += 1
             self.sessionData.clearLogVariables()
         })
         timer5.tolerance = 1.0
-        
         RunLoop.current.add(timer5, forMode: .default)
     }
     
     func ontimer2Reset() {
-        self.soundHelper.announceCompletion = {
+        let soundHelper1 = SoundHelper()
+        soundHelper1.announceCompletion = {
             /// state user face and orientation if the face is in the screen
             if (self.facePosition != "blank") {
-                self.soundHelper.announce(announcement: self.facePosition)
-                self.soundHelper.latestAnnouncement = self.facePosition
-                
-                // TODO: figure out a way to make the second completion handler work to replace the announcement
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                let soundHelper2 = SoundHelper()
+                soundHelper2.announceCompletion = {
                     self.soundHelper.announce(announcement: self.faceOrientation)
                     self.soundHelper.latestAnnouncement = self.faceOrientation
                 }
+                soundHelper2.announce(announcement: self.facePosition)
+                self.soundHelper.latestAnnouncement = self.facePosition
             } else {
-                self.soundHelper.announce(announcement: "please position your face in the screen")
+                soundHelper1.announce(announcement: "please position your face in the screen")
                 self.soundHelper.latestAnnouncement = "please position your face in the screen"
             }
         }
         
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
-        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+        soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
         self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
-        
     }
     
     func ontimer3Reset() {

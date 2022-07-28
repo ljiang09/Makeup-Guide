@@ -25,14 +25,14 @@ struct ContentView : View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
-            if (arManager.isIntroTextShowing) {
+            if (arManager.isTextShowing) {
                 VStack {
                     Spacer()
                     
                     if (voiceoverOn) {
                         Spacer()
                         
-                        Text(arManager.introText)
+                        Text(soundHelpers.latestAnnouncement)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white)
                             .background(Color.black.opacity(0.5))
@@ -41,9 +41,7 @@ struct ContentView : View {
                     Spacer()
                     
                     Button(action: {
-                        arManager.isIntroTextShowing = false
                         arManager.interruptVoiceover()
-                        arManager.runAtBeginning2()
                     }, label: {
                         Text("Done")
                             .padding(30)
