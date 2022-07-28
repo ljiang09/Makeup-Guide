@@ -39,7 +39,7 @@ class SoundHelper: NSObject {
     var latestAnnouncement: String = ""     /// this is used for when the voiceover is toggled on, it starts reading out the last command that was left off on (can't use currentAnnouncement because it' announcing "voiceover on/off"
     var announceCompletion: (()->())? = nil
     
-    private override init() {
+    override init() {
         super.init()
         
         synthesizer.delegate = self

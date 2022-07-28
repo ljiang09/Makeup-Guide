@@ -57,6 +57,9 @@ class ARSessionManager: NSObject, ObservableObject {
     @Published var isIntroTextShowing: Bool = true
     var introText: String = ""
     
+    /// this prevents the face collection from occurring during the intro text and the other beginning sections of the app
+    var readyToCollectFaceImages: Bool = false
+    
     private override init() {
         isButtonShowing = false
         isNeckImageShowing = false
@@ -102,8 +105,8 @@ class ARSessionManager: NSObject, ObservableObject {
                    bottom of the screen.
                    """
         
+        self.soundHelper.latestAnnouncement = introText // TODO: refactor the announce() function to take in a bool stating whether it should be considered the latest announcement (instead of this bs)
         self.soundHelper.announce(announcement: introText)
-        self.soundHelper.latestAnnouncement = introText
     }
     
     func interruptVoiceover() {
@@ -113,31 +116,42 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
-        self.soundHelper.announce(announcement: "This app uses the front facing camera. Follow the voiceover prompts. Hold or prop up your phone at arms length for best results.")
-        self.soundHelper.latestAnnouncement = "This app uses the front facing camera. Follow the voiceover prompts. Hold or prop up your phone at arms length for best results."
-        
-        self.fireTimer4()
-        self.fireTimer5()
-        
-        self.checkFaceUntilRepositioned(completion: {
-            self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
-            // TODO: run voiceover saying "face is centered"
+        let soundHelper1 = SoundHelper()
+        soundHelper1.announceCompletion = {
+            self.fireTimer4()
+            self.fireTimer5()
             
-            self.isCheckImageShowing = true
-            /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                self.isCheckImageShowing = false
+            self.checkFaceUntilRepositioned(completion: {
+                soundHelper1.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.isNeckImageShowing = true
-                    self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
-                    self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    self.isCheckImageShowing = true
+                    soundHelper1.announce(announcement: "Face is now centered.")
                     
-                    /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
-                    self.firetimer2()
+                    // TODO: make these all separate instances of the class so you can run multiple nested completions
+                    /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.isCheckImageShowing = false
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            self.isNeckImageShowing = true
+                            soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                            self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
+                            
+                            /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                            self.firetimer2()
+                            
+                            print("face image collections should be happening now")
+                            self.readyToCollectFaceImages = true
+                        }
+                    }
                 }
-            }
-        })
+            })
+        }
+        
+        let announcement1 = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results."
+        self.soundHelper.latestAnnouncement = announcement1
+        soundHelper1.announce(announcement: announcement1)
     }
     
     /// this function is intended to run at the beginning of the app lifecycle
@@ -156,26 +170,22 @@ class ARSessionManager: NSObject, ObservableObject {
                 self.soundHelper.latestAnnouncement = "please position your face in the screen"
             }
             
+            
             if (self.facePosition != "blank") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    self.soundHelper.announce(announcement: self.facePosition)
-                    self.soundHelper.latestAnnouncement = self.facePosition
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        self.soundHelper.announce(announcement: self.faceOrientation)
+                    let soundHelper1 = SoundHelper()
+                    soundHelper1.announceCompletion = {
+                        soundHelper1.announce(announcement: self.faceOrientation)
                         self.soundHelper.latestAnnouncement = self.faceOrientation
                     }
+                    soundHelper1.announce(announcement: self.facePosition)
+                    self.soundHelper.latestAnnouncement = self.facePosition
                 }
             }
-//            else {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-//                    self.soundHelper.announce(announcement: "please position your face in the screen")
-//                }
-//            }
         })
         timer1.tolerance = 0.2
         RunLoop.current.add(timer1, forMode: .default)
     }
-    
     
     
     /// this is fired when the user first correctly positions themself in the screen. every 8 seconds it reminds the user to rotate their head
@@ -228,28 +238,28 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     func ontimer2Reset() {
+        self.soundHelper.announceCompletion = {
+            /// state user face and orientation if the face is in the screen
+            if (self.facePosition != "blank") {
+                self.soundHelper.announce(announcement: self.facePosition)
+                self.soundHelper.latestAnnouncement = self.facePosition
+                
+                // TODO: figure out a way to make the second completion handler work to replace the announcement
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    self.soundHelper.announce(announcement: self.faceOrientation)
+                    self.soundHelper.latestAnnouncement = self.faceOrientation
+                }
+            } else {
+                self.soundHelper.announce(announcement: "please position your face in the screen")
+                self.soundHelper.latestAnnouncement = "please position your face in the screen"
+            }
+        }
+        
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
         self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
         self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
         
-        /// state user face and orientation if the face is in the screen
-        if (facePosition != "blank") {
-            // TODO: change this to use a delegate to determine when the speech has ended, rather than hard coding time values https://stackoverflow.com/questions/37538131/avspeechsynthesizer-detect-when-the-speech-is-finished
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                self.soundHelper.announce(announcement: self.facePosition)
-                self.soundHelper.latestAnnouncement = self.facePosition
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    self.soundHelper.announce(announcement: self.faceOrientation)
-                    self.soundHelper.latestAnnouncement = self.faceOrientation
-                }
-            }
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                self.soundHelper.announce(announcement: "please position your face in the screen")
-                self.soundHelper.latestAnnouncement = "please position your face in the screen"
-            }
-        }
     }
     
     func ontimer3Reset() {
@@ -435,7 +445,8 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         /// every frame, check if we have successfully collected the images. If not, try to collect them
-        if (!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) {
+        if ((!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) && readyToCollectFaceImages) {
+            print("now collecting face images")
             
             saveTextures1()
             
