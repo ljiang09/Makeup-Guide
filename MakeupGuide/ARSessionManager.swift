@@ -567,23 +567,6 @@ extension ARSessionManager: ARSCNViewDelegate {
         /// this is for the face UV unwrapping. unsure if scnfacegeometry is needed
         scnFaceGeometry.update(from: faceAnchor.geometry)
         
-//        print("STARTING FRAME")
-//        print("[")
-//        for vertex in faceAnchor.geometry.vertices {
-//            let vertexInWorldFrame = faceAnchor.transform * simd_float4(vertex, 1.0)
-//            let vertexInCameraFrame = frame.camera.transform.inverse * vertexInWorldFrame
-////            let pixelOfAnchor = frame.camera.projectionMatrix * vertexInCameraFrame
-////            let pixels = frame.camera.intrinsics * simd_float3(pixelOfAnchor.x, pixelOfAnchor.y, pixelOfAnchor.z)
-//            let vertexInPinholeConvention = simd_float4(vertexInCameraFrame.x, -vertexInCameraFrame.y, -vertexInCameraFrame.z, vertexInCameraFrame.w)
-//            let pixels = frame.camera.intrinsics * simd_float3(vertexInPinholeConvention.x, vertexInPinholeConvention.y, vertexInPinholeConvention.z)
-//
-//            print("[\(pixels.x/pixels.z), \(pixels.y/pixels.z)],")
-//        }
-//        self.exportTextureMap(fileName: "test")
-//
-//        print("]")
-//        let image = frame.capturedImage
-        
         faceUvGenerator.update(frame: frame, scene: self.sceneView.scene, headNode: node, geometry: scnFaceGeometry)
         
         /// collect data to send to firebase, but only every 0.5 seconds (120 times per second is too much lmao)
