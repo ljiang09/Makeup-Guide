@@ -466,6 +466,9 @@ extension ARSessionManager: ARSCNViewDelegate {
             
             /// Finish collecting images. this runs once, right when the images just finished all getting collected
             if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2]) {
+                
+                self.interruptVoiceover()       /// interrupt the face position/orientation voiceovers (since they rely on the shared SoundHelper instance)
+                
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
                 /// hide the instructional image and show the "check makeup" button
