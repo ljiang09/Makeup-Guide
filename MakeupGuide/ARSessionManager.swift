@@ -115,6 +115,7 @@ class ARSessionManager: NSObject, ObservableObject {
         soundHelpers1.announce(announcement: introText)
     }
     
+    /// this should be used mainly to stop the face position/orientation voiceovers because they rely on the shared instance of the soundhelpers class
     func interruptVoiceover() {
         self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
         DispatchQueue.main.async {
@@ -167,6 +168,8 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// this is called when the "Check your Makeup" button is clicked
     public func setGeneratingFaceTextures2() {
+        
+        interruptVoiceover()
         
         generatingFaceTextures2 = true
         
