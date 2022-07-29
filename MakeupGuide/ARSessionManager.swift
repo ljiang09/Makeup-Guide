@@ -35,7 +35,6 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// initialize timers without starting them yet
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
-    var timer3: Timer! = nil        // for checking the face position. Repeats every 3 seconds
     
     var timer4: Timer! = nil        // for collecting AR analytics every 0.5 seconds rather than every frame (120 fps)
     var timer5: Timer! = nil        // for sending analytics to firebase every 10 seconds
@@ -284,15 +283,6 @@ class ARSessionManager: NSObject, ObservableObject {
         RunLoop.current.add(timer2, forMode: .default)
     }
     
-    /// this is fired after the initial 3 UV images are collected.
-    func firetimer3() {
-        timer3 = Timer(fire: Date(), interval: 3.0, repeats: true, block: { _ in
-            self.ontimer3Reset()
-        })
-        timer3.tolerance = 0.1
-        RunLoop.current.add(timer3, forMode: .default)
-    }
-    
     func fireTimer4() {
         timer4 = Timer(fire: Date(), interval: 0.5, repeats: true, block: { _ in
             self.collectingData = true
@@ -338,17 +328,6 @@ class ARSessionManager: NSObject, ObservableObject {
         /// remind the user to position their head in the screen
         soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
         self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
-    }
-    
-    func ontimer3Reset() {
-        /// check the face orientation and speak face is rotated and such
-        if facePosition != "blank" {
-            self.soundHelper.announce(announcement: facePosition)
-            self.soundHelper.latestAnnouncement = facePosition
-        } else if faceOrientation != "blank" {
-            self.soundHelper.announce(announcement: faceOrientation)
-            self.soundHelper.latestAnnouncement = faceOrientation
-        }
     }
     
     
@@ -482,7 +461,6 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         /// every frame, check if we have successfully collected the images. If not, try to collect them
         if ((!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) && readyToCollectFaceImages) {
-            print("now collecting face images")
             
             saveTextures1()
             
@@ -503,7 +481,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 let soundHelpers1 = SoundHelper()
                 soundHelpers1.announceCompletion = {
                     print("done")
-//                    self.firetimer3()     // TODO: remove timer 3 entirely
                 }
                 let announcement = "Now, apply makeup. Whenever you're done, click the button at the bottom of the screen to check your makeup."
                 self.soundHelper.latestAnnouncement = announcement
@@ -535,7 +512,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 let soundHelpers1 = SoundHelper()
                 soundHelpers1.announceCompletion = {
                     print("done")
-//                    self.firetimer3()
                 }
                 
                 /// announcement after the second set of face images is collected
