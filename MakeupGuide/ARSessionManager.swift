@@ -242,10 +242,10 @@ class ARSessionManager: NSObject, ObservableObject {
             })
         }
         
-        isTextShowing = true
-        
         let announcement: String = "Now that you're done applying makeup, let's take a few more images to compare to the images you took earlier without makeup on. Start by centering your face in the screen again."
         self.soundHelper.latestAnnouncement = announcement
+        isTextShowing = true
+        
         soundHelper1.announce(announcement: announcement)
         
     }
@@ -531,7 +531,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 }
                 
                 /// announcement after the second set of face images is collected
-                let announcement = "Now the app will check over your face of makeup. Note that right now, this part of the app is not implemented yet so this voiceover is just a placeholder."
+                let announcement = "Now the app will check over your face of makeup. Note that right now, this part of the app is not implemented yet so this voiceover is just a placeholder. If you want to check your makeup again, you can click the button at the bottom of the screen."    // TODO: when you add the analysis part of the app, move the last sentence to be after the analysis (because right now this will be before the analysis happens
                 self.soundHelper.latestAnnouncement = announcement
                 soundHelpers1.announce(announcement: announcement)
             }
