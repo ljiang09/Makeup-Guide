@@ -476,7 +476,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
-                /// hide the instructional image and show the "check makeup" button
+                /// hide the instructional image and show the "check makeup" button + text
                 DispatchQueue.main.async {
                     self.isNeckImageShowing = false
                     self.isCheckMakeupButtonShowing = true
@@ -486,13 +486,18 @@ extension ARSessionManager: ARSCNViewDelegate {
                     timer2 = nil
                 }
                 
-                let soundHelpers1 = SoundHelper()
-                soundHelpers1.announceCompletion = {
+                // MARK: idk why but the completion doesn't work correctly, runs prematurely. maybe bc it's called inside the renderer??? because the other completion doesn't run correctyly either..
+                let soundHelper2 = SoundHelper()
+                soundHelper2.announceCompletion = {
                     print("done")
+                    self.isTextShowing = false
+                }
+                DispatchQueue.main.async {
+                    self.isTextShowing = true
                 }
                 let announcement = "Now, apply makeup. Whenever you're done, click the button at the bottom of the screen to check your makeup."
+                soundHelper2.announce(announcement: announcement)
                 self.soundHelper.latestAnnouncement = announcement
-                soundHelpers1.announce(announcement: announcement)
             }
         }
         
@@ -523,7 +528,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                 }
                 
                 /// announcement after the second set of face images is collected
-                let announcement = "Now the app will check over your face of makeup. Note that right now (as of 7/18/2022), this part of the app is not implemented yet so this voiceover is just a placeholder."
+                let announcement = "Now the app will check over your face of makeup. Note that right now, this part of the app is not implemented yet so this voiceover is just a placeholder."
                 self.soundHelper.latestAnnouncement = announcement
                 soundHelpers1.announce(announcement: announcement)
             }
