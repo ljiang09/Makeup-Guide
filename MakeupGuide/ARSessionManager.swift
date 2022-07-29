@@ -88,9 +88,12 @@ class ARSessionManager: NSObject, ObservableObject {
     func appIntroduction() {
         let soundHelpers1 = SoundHelper()
         let introText = """
+                        Welcome to the Makeup Assist app!
                         This app uses the front facing camera to check your makeup. \
+                        It will be useful to have your volume turned up as many \
+                        instructions in the app are announced through voiceover. \
                         For the app to work properly, make sure you don't have makeup \
-                        on when you first open the app. \
+                        on when you first open the app.
                         First, you'll be guided to center your face in the screen. \
                         When you're centered, a success sound will play and you'll go \
                         into the next section of the app where three images will be taken \
@@ -161,7 +164,7 @@ class ARSessionManager: NSObject, ObservableObject {
         
         isTextShowing = true
         
-        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results. Now, we will take three pictures of your face to represent what your face looks like without makeup on. This will later be compared to your face after you apply makeup, to check where you have applied makeup. Start by moving your face around until it is centered in the screen."
+        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results. Now, we will take pictures of your face facing forward, turned left, and turned right to represent what your face looks like without makeup on. This will later be compared to your face after you apply makeup, to check where you have applied makeup. Start by moving your face around until it is centered in the screen."
         self.soundHelper.latestAnnouncement = announcement
         soundHelper1.announce(announcement: announcement)
     }
