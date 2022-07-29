@@ -55,7 +55,7 @@ struct ContentView : View {
                 }
             }
             
-            if ((arManager.isButtonShowing) && (!arManager.generatingFaceTextures2)) {
+            if ((arManager.isCheckMakeupButtonShowing) && (!arManager.generatingFaceTextures2)) {
                 VStack {
                     Spacer()
                     
@@ -104,7 +104,7 @@ struct ContentView : View {
                     voiceoverOn = true
                     UserDefaults.standard.set(true, forKey: "VoiceoversOn")
                     soundHelpers.announce(announcement: "Voiceover is on")
-                    soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)
+                    soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)    // TODO: this doesn't get announced either.. hrm
                 }
             }) {
                 if (voiceoverOn) {
