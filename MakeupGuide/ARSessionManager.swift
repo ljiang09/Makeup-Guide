@@ -135,7 +135,7 @@ class ARSessionManager: NSObject, ObservableObject {
             self.fireTimer5()
             
             self.checkFaceUntilRepositioned(completion: {
-                soundHelper1.playSound(soundName: "SuccessSound", dotExt: "wav")
+                self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 self.isCheckImageShowing = true
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -209,11 +209,13 @@ class ARSessionManager: NSObject, ObservableObject {
         
         /// run face centering stuff again since they presumably put their phone down.
         let soundHelper1 = SoundHelper()
+        
+        // TODO: this doesn't run on completion!!!!!! it seems to run immediately when you click the Check Makeup button, which means it is running when the announcement just begins. grrrr i hate it here
         soundHelper1.announceCompletion = {
             self.isTextShowing = false
             
             self.checkFaceUntilRepositioned(completion: {
-                soundHelper1.playSound(soundName: "SuccessSound", dotExt: "wav")
+                self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 self.isCheckImageShowing = true
                 
                 self.generatingFaceTextures2 = true
@@ -254,31 +256,48 @@ class ARSessionManager: NSObject, ObservableObject {
     /// this function is intended to run at the beginning of the app lifecycle
     /// it continually checks the face position until the face is centered and then runs the closure
     func checkFaceUntilRepositioned(completion: @escaping () -> Void) {
-        let timer1: Timer = Timer(fire: Date(), interval: 3.0, repeats: true, block: { timer1 in
-            // TODO: change timer value (or add another timer) to check face centered more often than every 3 seconds
-            if (self.facePosition == "Face is centered") {
-                timer1.invalidate()
-                completion()
-            } else {
-                self.soundHelper.announce(announcement: "please position your face in the screen")
-                self.soundHelper.latestAnnouncement = "please position your face in the screen"
-            }
+        var announcement: String = ""
+        
+        /// this timer states the user's face position every 3 seconds, and when the position is centered, it starts stating the orientation of the face
+        let timer1: Timer = Timer(fire: Date(), interval: 4.0, repeats: true, block: { timer1 in
             
-            
-            if (self.facePosition != "blank") {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    let soundHelper1 = SoundHelper()
-                    soundHelper1.announceCompletion = {
-                        soundHelper1.announce(announcement: self.faceOrientation)
-                        self.soundHelper.latestAnnouncement = self.faceOrientation
-                    }
-                    soundHelper1.announce(announcement: self.facePosition)
-                    self.soundHelper.latestAnnouncement = self.facePosition
+            /// get the user to center their face first, then orient it correctly
+            if (self.facePosition != "Face is centered") {
+                announcement = "Please center your face in the screen. "
+                if (self.facePosition != "blank") {
+                    announcement = announcement + self.facePosition
                 }
+                
+                /// for some reason the announcements will not keep playing if i use the shared instance, so i'm just making a new instance each time and it seems to announce it each time like intended
+                let soundHelp = SoundHelper()
+                soundHelp.announce(announcement: announcement)
+                self.soundHelper.latestAnnouncement = announcement
+            } else if (self.faceOrientation != CheckFaceHelper.shared.headOn) {
+                // TODO: sometimes rotated right will be "blank" if not rotated enough
+                let soundHelp = SoundHelper()
+                announcement = "Please turn your face towards the camera. " + self.faceOrientation
+                soundHelp.announce(announcement: announcement)
+                self.soundHelper.latestAnnouncement = announcement
             }
         })
         timer1.tolerance = 0.2
         RunLoop.current.add(timer1, forMode: .default)
+        
+        
+        /// this timer checks the user's face position every 0.5 seconds based on the renderer's updates, controls when the completion handler runs (based on both position and orientation of the face)
+        // TODO: honestly this is kind of just sitting here as a form of "while loop", waiting for a couple values to change. i think there should be a better way to go about this lmao
+        let timer3: Timer = Timer(fire: Date(), interval: 0.5, repeats: true, block: { timer3 in
+
+            if (self.facePosition == "Face is centered" && self.faceOrientation == CheckFaceHelper.shared.headOn) {
+                /// the face is correctly positioned in the screen and now you can invalidate both timers and run the completion handler
+                timer1.invalidate()
+                timer3.invalidate()
+                completion()
+            }
+
+        })
+        timer3.tolerance = 0.05
+        RunLoop.current.add(timer3, forMode: .default)
     }
     
     
@@ -377,7 +396,7 @@ class ARSessionManager: NSObject, ObservableObject {
     private func exportTextureMap(fileName: String) {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
