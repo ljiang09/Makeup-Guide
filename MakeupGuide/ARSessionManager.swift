@@ -117,7 +117,9 @@ class ARSessionManager: NSObject, ObservableObject {
     
     func interruptVoiceover() {
         self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
-        isTextShowing = false
+        DispatchQueue.main.async {
+            self.isTextShowing = false
+        }
     }
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
