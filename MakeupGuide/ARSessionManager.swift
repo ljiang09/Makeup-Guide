@@ -273,7 +273,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 soundHelp.announce(announcement: announcement)
                 self.soundHelper.latestAnnouncement = announcement
             } else if (self.faceOrientation != CheckFaceHelper.shared.headOn) {
-                // TODO: sometimes rotated right will be "blank" if not rotated enough
+                // TODO: sometimes rotated right will be "blank" if not rotated enough!!!!!
                 let soundHelp = SoundHelper()
                 announcement = "Please turn your face towards the camera. " + self.faceOrientation
                 soundHelp.announce(announcement: announcement)

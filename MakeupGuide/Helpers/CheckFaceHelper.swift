@@ -35,19 +35,13 @@ class CheckFaceHelper {
                 && (transformMatrix[2][0] > th3)) {
                 return tiltedForward
             }
-            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -0.5)
-                && (transformMatrix[2][0] < -0.5)) {
+            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -th3)
+                && (transformMatrix[2][0] < -th3)) {
                 return tiltedBackward
             }
         }
-        if ((transformMatrix[0][1] > th1) && (-th2...th2 ~= transformMatrix[0][2])
-            && (-th2...th2 ~= transformMatrix[2][1]) && (transformMatrix[1][0] < -th1)
-            && (-th3...th3 ~= transformMatrix[1][2]) && (-th3...th3 ~= transformMatrix[2][0])) {
-            return headOn
-        }
         
-        
-        return "blank"
+        return headOn
     }
 
 
