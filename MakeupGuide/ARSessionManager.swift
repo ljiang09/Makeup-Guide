@@ -86,7 +86,6 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// runs voiceovers at the beginning to get the user acquainted with the app
     func appIntroduction() {
-        let soundHelpers1 = SoundHelper()
         let introText = """
                         Welcome to the Makeup Assist app!
                         This app uses the front facing camera to check your makeup. \
@@ -109,18 +108,18 @@ class ARSessionManager: NSObject, ObservableObject {
         
         isTextShowing = true
         
-        soundHelpers1.announceCompletion = {
+        self.soundHelper.latestAnnouncement = introText // TODO: refactor the announce() function to take in a bool stating whether it should be considered the latest announcement (instead of this bs)
+        self.soundHelper.announce(announcement: introText) {
             self.isTextShowing = false
             self.runAtBeginning2()
         }
-        
-        self.soundHelper.latestAnnouncement = introText // TODO: refactor the announce() function to take in a bool stating whether it should be considered the latest announcement (instead of this bs)
-        soundHelpers1.announce(announcement: introText)
     }
     
     /// this should be used mainly to stop the face position/orientation voiceovers because they rely on the shared instance of the soundhelpers class
     func interruptVoiceover() {
         self.soundHelper.synthesizer.stopSpeaking(at: .immediate)
+        // TODO: clear the queue here within the function rather than just calling this fxn twice when needed
+        
         DispatchQueue.main.async {
             self.isTextShowing = false
         }
@@ -128,8 +127,11 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// continually checks face until repositioned. Once it is, run the next phase of face rotation/snapshot gathering
     func runAtBeginning2() {
-        let soundHelper1 = SoundHelper()
-        soundHelper1.announceCompletion = {
+        isTextShowing = true
+        
+        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results. Now, we will take pictures of your face facing forward, turned left, and turned right to represent what your face looks like without makeup on. This will later be compared to your face after you apply makeup, to check where you have applied makeup. Start by moving your face around until it is centered in the screen."
+        self.soundHelper.latestAnnouncement = announcement
+        self.soundHelper.announce(announcement: announcement) {
             self.isTextShowing = false
             self.fireTimer4()
             self.fireTimer5()
@@ -139,16 +141,15 @@ class ARSessionManager: NSObject, ObservableObject {
                 self.isCheckImageShowing = true
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    soundHelper1.announce(announcement: "Face is now centered.")
+                    self.soundHelper.announce(announcement: "Face is now centered.")
                     
-                    // TODO: make these all separate instances of the class so you can run multiple nested completions
                     /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.isCheckImageShowing = false
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             self.isNeckImageShowing = true
-                            soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                            self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
                             self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
                             
                             /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
@@ -162,11 +163,6 @@ class ARSessionManager: NSObject, ObservableObject {
             })
         }
         
-        isTextShowing = true
-        
-        let announcement: String = "Follow the voiceover prompts. Point the front facing camera towards your face. Hold or prop up your phone at about arms length for best results. Now, we will take pictures of your face facing forward, turned left, and turned right to represent what your face looks like without makeup on. This will later be compared to your face after you apply makeup, to check where you have applied makeup. Start by moving your face around until it is centered in the screen."
-        self.soundHelper.latestAnnouncement = announcement
-        soundHelper1.announce(announcement: announcement)
     }
     
     /// this is called when the "Check your Makeup" button is clicked
@@ -207,11 +203,15 @@ class ARSessionManager: NSObject, ObservableObject {
         }
         
         
+        // TODO: for some reason this text isn't showing. the announcement voiceover works and the completion works but the text and button do not work. boo
+        self.isTextShowing = false
         /// run face centering stuff again since they presumably put their phone down.
-        let soundHelper1 = SoundHelper()
+        let announcement: String = "Now that you're done applying makeup, let's take a few more images to compare to the images you took earlier without makeup on. Start by centering your face in the screen again."
+        self.soundHelper.latestAnnouncement = announcement
+        self.isTextShowing = true
         
-        // TODO: this doesn't run on completion!!!!!! it seems to run immediately when you click the Check Makeup button, which means it is running when the announcement just begins. grrrr i hate it here
-        soundHelper1.announceCompletion = {
+        
+        self.soundHelper.announce(announcement: announcement) {
             self.isTextShowing = false
             
             self.checkFaceUntilRepositioned(completion: {
@@ -221,7 +221,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 self.generatingFaceTextures2 = true
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    soundHelper1.announce(announcement: "Face is now centered.")
+                    self.soundHelper.announce(announcement: "Face is now centered.")
                     
                     // TODO: make these all separate instances of the class so you can run multiple nested completions
                     /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
@@ -230,7 +230,7 @@ class ARSessionManager: NSObject, ObservableObject {
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             self.isNeckImageShowing = true
-                            soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                            self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
                             self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
                             
                             /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
@@ -243,12 +243,6 @@ class ARSessionManager: NSObject, ObservableObject {
                 }
             })
         }
-        
-        let announcement: String = "Now that you're done applying makeup, let's take a few more images to compare to the images you took earlier without makeup on. Start by centering your face in the screen again."
-        self.soundHelper.latestAnnouncement = announcement
-        isTextShowing = true
-        
-        soundHelper1.announce(announcement: announcement)
         
     }
     
@@ -269,14 +263,11 @@ class ARSessionManager: NSObject, ObservableObject {
                 }
                 
                 /// for some reason the announcements will not keep playing if i use the shared instance, so i'm just making a new instance each time and it seems to announce it each time like intended
-                let soundHelp = SoundHelper()
-                soundHelp.announce(announcement: announcement)
+                self.soundHelper.announce(announcement: announcement)
                 self.soundHelper.latestAnnouncement = announcement
             } else if (self.faceOrientation != CheckFaceHelper.shared.headOn) {
-                // TODO: sometimes rotated right will be "blank" if not rotated enough!!!!!
-                let soundHelp = SoundHelper()
                 announcement = "Please turn your face towards the camera. " + self.faceOrientation
-                soundHelp.announce(announcement: announcement)
+                self.soundHelper.announce(announcement: announcement)
                 self.soundHelper.latestAnnouncement = announcement
             }
         })
@@ -334,26 +325,20 @@ class ARSessionManager: NSObject, ObservableObject {
     }
     
     func ontimer2Reset() {
-        let soundHelper1 = SoundHelper()
-        soundHelper1.announceCompletion = {
-            /// state user face and orientation if the face is in the screen
-            if (self.facePosition != "blank") {
-                let soundHelper2 = SoundHelper()
-                soundHelper2.announceCompletion = {
-                    self.soundHelper.announce(announcement: self.faceOrientation)
-                    self.soundHelper.latestAnnouncement = self.faceOrientation
-                }
-                soundHelper2.announce(announcement: self.facePosition)
-                self.soundHelper.latestAnnouncement = self.facePosition
-            } else {
-                soundHelper1.announce(announcement: "please position your face in the screen")
-                self.soundHelper.latestAnnouncement = "please position your face in the screen"
-            }
-        }
         
         // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
         /// remind the user to position their head in the screen
-        soundHelper1.announce(announcement: self.soundHelper.rotateHeadInstructions)
+        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions) {
+            /// state user face and orientation if the face is in the screen
+            // TODO: fix this to actually find the face in the screen rather than just using the last face geometry that got stored
+            if (self.facePosition != "blank") {
+                self.soundHelper.announce(announcement: "\(self.facePosition), \(self.faceOrientation)")
+//                self.soundHelper.latestAnnouncement = self.facePosition + self.faceOrientation
+            } else {
+                self.soundHelper.announce(announcement: "please position your face in the screen")
+                self.soundHelper.latestAnnouncement = "please position your face in the screen"
+            }
+        }
         self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
     }
     
@@ -367,7 +352,6 @@ class ARSessionManager: NSObject, ObservableObject {
     
     /// this is called every frame to save the second batch of textures, when the user clicks the button
     private func saveTextures2() {
-        // TODO: fix the CheckFaceHelper file to show whether the face is head on, rather than whether it just hasn't been set yet. basically the goal is for the following `if` statement to not `== "blank"`
         // TODO: check to make sure the snapshots are actually good
         
         collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn2")
@@ -396,6 +380,7 @@ class ARSessionManager: NSObject, ObservableObject {
     private func exportTextureMap(fileName: String) {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
+            // Supposedly, since the user's face is centered before the first image is being taken, this should make the images be good.....
 //            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             
             // access documents directory
@@ -508,18 +493,20 @@ extension ARSessionManager: ARSCNViewDelegate {
                     timer2 = nil
                 }
                 
-                // MARK: idk why but the completion doesn't work correctly, runs prematurely. maybe bc it's called inside the renderer??? because the other completion doesn't run correctyly either..
-                let soundHelper2 = SoundHelper()
-                soundHelper2.announceCompletion = {
-                    print("done")
-                    self.isTextShowing = false
-                }
-                DispatchQueue.main.async {
+                // MARK: the problem seems to be that it gets caught up in trying to say face position and orientation from the repeating function in timer2, even though that should all be interrupted.... so hwen it tries to queue the next announcement up, there isn't room to do so since it stores only 2 at one time. but anyways having it delay for a short bit of time seems to make it work??? haven't thoroughly debugged this yet
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                    let announcement = "Now, apply makeup. Whenever you're done, click the button at the bottom of the screen to check your makeup."
+                    
+                    self.interruptVoiceover()
+                    self.interruptVoiceover()
+                    
+                    self.soundHelper.latestAnnouncement = announcement
                     self.isTextShowing = true
+                    
+                    self.soundHelper.announce(announcement: announcement) {
+                        self.isTextShowing = false
+                    }
                 }
-                let announcement = "Now, apply makeup. Whenever you're done, click the button at the bottom of the screen to check your makeup."
-                soundHelper2.announce(announcement: announcement)
-                self.soundHelper.latestAnnouncement = announcement
             }
         }
         
@@ -544,15 +531,12 @@ extension ARSessionManager: ARSCNViewDelegate {
                     timer2 = nil
                 }
                 
-                let soundHelpers1 = SoundHelper()
-                soundHelpers1.announceCompletion = {
-                    print("done")
-                }
-                
                 /// announcement after the second set of face images is collected
                 let announcement = "Now the app will check over your face of makeup. Note that right now, this part of the app is not implemented yet so this voiceover is just a placeholder. If you want to check your makeup again, you can click the button at the bottom of the screen."    // TODO: when you add the analysis part of the app, move the last sentence to be after the analysis (because right now this will be before the analysis happens
                 self.soundHelper.latestAnnouncement = announcement
-                soundHelpers1.announce(announcement: announcement)
+                self.soundHelper.announce(announcement: announcement) {
+                    print("done")
+                }
             }
         }
         

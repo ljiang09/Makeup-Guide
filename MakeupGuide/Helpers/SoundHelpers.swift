@@ -19,7 +19,8 @@ class SoundHelper: NSObject {
     static var shared: SoundHelper = SoundHelper()
     let synthesizer = Synthesizer.shared     /// this should only be created once because it is memory intensive
     var player: AVAudioPlayer?
-    
+    @ObservedObject var sessionData = LogSessionData.shared
+
     /// the voiceover callouts for face positioning
     let rotateHeadInstructions = "slowly turn your head left and right"
     let headPosRight = "face is too far right of the camera"
@@ -34,12 +35,14 @@ class SoundHelper: NSObject {
     
     private var currentAnnouncement: String?        /// The announcement that is currently being read.  If this is nil, that implies nothing is being read
     private var nextAnnouncement: String?           /// The announcement that should be read immediately after this one finishes
+    private var nextAnnounceCompletion: (()->())? = nil
+
     private var announcementRemovalTimer: Timer?    /// times when an announcement should be removed.  These announcements are displayed on the `announcementText` label.
     
     var latestAnnouncement: String = ""     /// this is used for when the voiceover is toggled on, it starts reading out the last command that was left off on (can't use currentAnnouncement because it' announcing "voiceover on/off"
-    var announceCompletion: (()->())? = nil
+    private var announceCompletion: (()->())? = nil
     
-    override init() {
+    override private init() {
         super.init()
         
         synthesizer.delegate = self
@@ -51,28 +54,27 @@ class SoundHelper: NSObject {
         }
         
         NotificationCenter.default.addObserver(forName: UIAccessibility.announcementDidFinishNotification, object: nil, queue: nil) { (notification) -> Void in
-            self.currentAnnouncement = nil
-            
-            if (self.announceCompletion != nil) {
-                print("2 completion should be happening here")
-                self.announceCompletion!()
-                self.announceCompletion = nil
-            }
-            
-            if let nextAnnouncement = self.nextAnnouncement {
-                self.nextAnnouncement = nil
-                self.announce(announcement: nextAnnouncement)
-            }
+            self.handleAnnouncementFinished()
         }
         
         NotificationCenter.default.addObserver(forName: UIAccessibility.voiceOverStatusDidChangeNotification, object: nil, queue: nil) { (notification) -> Void in
-            self.currentAnnouncement = nil
-            
-            if (self.announceCompletion != nil) {
-                print("3 completion should be happening here")
-                self.announceCompletion!()
-                self.announceCompletion = nil
-            }
+            self.handleAnnouncementFinished()
+        }
+    }
+    
+    private func handleAnnouncementFinished(finishedAnnouncement: String?=nil) {
+        currentAnnouncement = nil
+        
+        if let completion = self.announceCompletion {
+            print("5 completion should be happening here \(finishedAnnouncement)")
+            announceCompletion = nil
+            completion()
+        }
+        
+        if let nextAnnouncement = self.nextAnnouncement, let nextAnnounceCompletion = nextAnnounceCompletion {
+            self.nextAnnouncement = nil
+            self.nextAnnounceCompletion = nil
+            announce(announcement: nextAnnouncement, completionHandler: nextAnnounceCompletion)
         }
     }
     
@@ -111,16 +113,13 @@ class SoundHelper: NSObject {
     ///
     /// - Parameter announcement: the text to read to the user
     /// note that when you call this function, if you want to have a completion handler, change `self.announceCompletion` to be the stuff you want to run
-    func announce(announcement: String) {
-        
+    func announce(announcement: String, completionHandler: (()->())?=nil) {
         // if the user doesn't want voiceovers, skip it
         if (!UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
             announceCompletion = nil
             return
         }
-        
-        @ObservedObject var sessionData = LogSessionData.shared
-        
+                
         // ensure the code is running on the main thread
         if !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -133,6 +132,7 @@ class SoundHelper: NSObject {
             // don't interrupt current announcement, but if there is something new to say put it on the queue to say next.  Note that adding it to the queue in this fashion could result in the next queued announcement being preempted
             if currentAnnouncement != announcement {
                 nextAnnouncement = announcement
+                self.nextAnnounceCompletion = completionHandler
             }
             
             return
@@ -141,6 +141,7 @@ class SoundHelper: NSObject {
         // VoiceOver is the preferred option for TTS
         if UIAccessibility.isVoiceOverRunning {
             currentAnnouncement = announcement
+            self.announceCompletion = completionHandler
             UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: announcement)
         }
         // but if the user hasn't enabled VoiceOver, use a synthesizer
@@ -157,6 +158,7 @@ class SoundHelper: NSObject {
                 utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.languageCode)
                 utterance.rate = 0.5
                 currentAnnouncement = announcement
+                self.announceCompletion = completionHandler
                 synthesizer.speak(utterance)
             } catch {
                 print("Unexpteced error announcing something using AVSpeechEngine!")
@@ -189,19 +191,8 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
                            didFinish utterance: AVSpeechUtterance) {
         // TODO: after the first time the synthesizer is called, it runs this delegate incorrectly at the beginning of the speech utterance
         
-        currentAnnouncement = nil
-        
-        if (self.announceCompletion != nil) {
-            print("4 completion should be happening here")
-            self.announceCompletion!()
-            announceCompletion = nil
-        }
-        
-        if let nextAnnouncement = self.nextAnnouncement {
-            self.nextAnnouncement = nil
-            announce(announcement: nextAnnouncement)
-        }
-        
+        handleAnnouncementFinished(finishedAnnouncement: utterance.speechString)
+
         // send some kind of notification to the ar session manager.. maybe run a function in there?
         
     }
@@ -213,18 +204,7 @@ extension SoundHelper: AVSpeechSynthesizerDelegate {
     ///   - utterance: the utterance itself
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                            didCancel utterance: AVSpeechUtterance) {
-        currentAnnouncement = nil
-        
-        if (self.announceCompletion != nil) {
-            print("5 completion should be happening here")
-            self.announceCompletion!()
-            announceCompletion = nil
-        }
-        
-        if let nextAnnouncement = self.nextAnnouncement {
-            self.nextAnnouncement = nil
-            announce(announcement: nextAnnouncement)
-        }
+        handleAnnouncementFinished(finishedAnnouncement: utterance.speechString)
     }
 }
 
