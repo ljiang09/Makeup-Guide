@@ -12,6 +12,8 @@ class CheckFaceHelper {
     
     let rotatedLeft = "Face is rotated left"
     let rotatedRight = "Face is rotated right"
+    let rotatedSlightLeft = "Face is rotated slightly left"
+    let rotatedSlightRight = "Face is rotated slightly right"
     let tiltedForward = "Face is tilted forward"
     let tiltedBackward = "Face is tilted backward"
     let headOn = "Face is head on"
@@ -39,6 +41,15 @@ class CheckFaceHelper {
                 && (transformMatrix[2][0] < -th3)) {
                 return tiltedBackward
             }
+        }
+        
+        if ((transformMatrix[0][1] < 0.97) && (transformMatrix[0][2] > 0.27)
+            && (transformMatrix[2][1] < -0.27)) {
+            return rotatedSlightLeft
+        }
+        if ((transformMatrix[0][1] < 0.97) && (transformMatrix[0][2] < -0.27)
+            && (transformMatrix[2][1] > 0.27)) {
+            return rotatedSlightRight
         }
         
         return headOn
