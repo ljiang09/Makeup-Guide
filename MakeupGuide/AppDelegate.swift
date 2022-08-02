@@ -42,10 +42,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// runs when the app session ends
     func applicationWillTerminate(_ application: UIApplication) {
         // delete the face texture images that were used during the session
-        let possibleDirectories = [arManager.headOnImgDirectory1,
+        let possibleDirectories = [arManager.slightLeftImgDirectory1,
+                                   arManager.slightRightImgDirectory1,
                                    arManager.rotatedLeftImgDirectory1,
                                    arManager.rotatedRightImgDirectory1,
-                                   arManager.headOnImgDirectory2,
+                                   arManager.slightLeftImgDirectory2,
+                                   arManager.slightRightImgDirectory2,
                                    arManager.rotatedLeftImgDirectory2,
                                    arManager.rotatedRightImgDirectory2]
         possibleDirectories.forEach { value in

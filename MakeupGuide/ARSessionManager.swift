@@ -12,50 +12,47 @@ import ARKit
 import UIKit
 
 class ARSessionManager: NSObject, ObservableObject {
-    // variables for the UV unwrapping
+    let sceneView = ARSCNView(frame: .zero)
+    static var shared: ARSessionManager = ARSessionManager()
+    let soundHelper = SoundHelper.shared
+    @ObservedObject var sessionData = LogSessionData.shared
+    
+    /// variables for UV unwrapping
     private var faceUvGenerator: FaceTextureGenerator!
     private var scnFaceGeometry: ARSCNFaceGeometry!
     private let faceTextureSize = 1024 //px
     
-    let sceneView = ARSCNView(frame: .zero)
-    
-    static var shared: ARSessionManager = ARSessionManager()
-    let soundHelper = SoundHelper.shared
-    
-    @Published var isCheckMakeupButtonShowing: Bool            // represents the button on the ContentView to get a second batch of images
+    @Published var isCheckMakeupButtonShowing: Bool     // represents the button on the ContentView to get a second batch of images
     @Published var isNeckImageShowing: Bool
     @Published var isCheckImageShowing: Bool
     @Published var generatingFaceTextures2: Bool        // indicates the user wants to generate the second set of textures
+    @Published var isTextShowing: Bool = false          // toggled every time a long voiceover is read and needs to be displayed as text on the screen
     
     var faceAnchorTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-    var faceImagesCollected: [Bool] = [false, false, false, false, false, false]   /// 0-2 are for first set, 3-5 for last set
+    var faceImagesCollected: [Bool] = [false, false, false, false, false, false, false, false]   /// 0-3 are for first set, 4-7 for last set
     
     var facePosition: String = "blank"
     var faceOrientation: String = "blank"
     
     /// initialize timers without starting them yet
     var timer2: Timer! = nil        // for the beginning "rotate head left and right" section. Repeats every 8 seconds
-    
     var timer4: Timer! = nil        // for collecting AR analytics every 0.5 seconds rather than every frame (120 fps)
     var timer5: Timer! = nil        // for sending analytics to firebase every 10 seconds
-    
-    @ObservedObject var sessionData = LogSessionData.shared
     
     var collectingData: Bool = false        // toggled by timer and collection in delegate. spaces out analytic collection so it's not every frame
     
     /// for the first set of UV textures, when the app first opens
-    var headOnImgDirectory1: URL!
+    var slightLeftImgDirectory1: URL!
+    var slightRightImgDirectory1: URL!
     var rotatedLeftImgDirectory1: URL!
     var rotatedRightImgDirectory1: URL!
     /// for the second set of UV textures, when the user clicks the "check makeup" button
-    var headOnImgDirectory2: URL!
+    var slightLeftImgDirectory2: URL!
+    var slightRightImgDirectory2: URL!
     var rotatedLeftImgDirectory2: URL!
     var rotatedRightImgDirectory2: URL!
     
-    /// toggled every time a long voiceover is read and needs to be displayed as text on the screen
-    @Published var isTextShowing: Bool = false
-    
-    /// this prevents the face collection from occurring during the intro text and the other beginning sections of the app
+    /// this prevents the face textures from being collected during the intro text and the other beginning sections of the app
     var readyToCollectFaceImages: Bool = false
     
     private override init() {
@@ -63,11 +60,10 @@ class ARSessionManager: NSObject, ObservableObject {
         isNeckImageShowing = false
         isCheckImageShowing = false
         generatingFaceTextures2 = false
-        
         super.init()
+        
         sceneView.session.run(ARFaceTrackingConfiguration())
         sceneView.delegate = self
-        
         
         // TODO: test whether having fill mesh true/false is more accurate
         self.scnFaceGeometry = ARSCNFaceGeometry(device: self.sceneView.device!, fillMesh: true)
@@ -78,7 +74,6 @@ class ARSessionManager: NSObject, ObservableObject {
             viewportSize: UIScreen.main.bounds.size,
             face: self.scnFaceGeometry,
             textureSize: faceTextureSize)
-        
         
         appIntroduction()
         
@@ -173,32 +168,24 @@ class ARSessionManager: NSObject, ObservableObject {
         generatingFaceTextures2 = true
         
         /// create a clean slate (as if the button had never been clicked before). reset the face images collected, delete the files that were written to the points
-        self.faceImagesCollected[3] = false
         self.faceImagesCollected[4] = false
         self.faceImagesCollected[5] = false
+        self.faceImagesCollected[6] = false
+        self.faceImagesCollected[7] = false
         
-        if (self.headOnImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: self.headOnImgDirectory2)
-                print("deleted Head On 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
-        if (self.rotatedLeftImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: self.rotatedLeftImgDirectory2)
-                print("deleted rotated left 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
-            }
-        }
-        if (self.rotatedRightImgDirectory2 != nil) {
-            do {
-                try FileManager.default.removeItem(at: self.rotatedRightImgDirectory2)
-                print("deleted rotated right 2 image")
-            } catch {
-                print("Could not clear temp folder: \(error)")
+        let possibleDirectories = [slightLeftImgDirectory2,
+                                   slightRightImgDirectory2,
+                                   rotatedLeftImgDirectory2,
+                                   rotatedRightImgDirectory2]
+        
+        for directory in possibleDirectories {
+            if (directory != nil) {
+                do {
+                    try FileManager.default.removeItem(at: directory!)
+                    print("deleted image at \(String(describing: directory))")
+                } catch {
+                    print("Could not clear temp folder: \(error)")
+                }
             }
         }
         
@@ -218,7 +205,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 self.isCheckImageShowing = true
                 
-                self.generatingFaceTextures2 = true
+//                self.generatingFaceTextures2 = true
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     self.soundHelper.announce(announcement: "Face is now centered.")
@@ -236,14 +223,12 @@ class ARSessionManager: NSObject, ObservableObject {
                             /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
                             self.firetimer2()
                             
-                            print("face image collections should be happening now")
                             self.readyToCollectFaceImages = true
                         }
                     }
                 }
             })
         }
-        
     }
     
     
@@ -276,7 +261,7 @@ class ARSessionManager: NSObject, ObservableObject {
         
         
         /// this timer checks the user's face position every 0.5 seconds based on the renderer's updates, controls when the completion handler runs (based on both position and orientation of the face)
-        // TODO: honestly this is kind of just sitting here as a form of "while loop", waiting for a couple values to change. i think there should be a better way to go about this lmao
+        // TODO: change this to be a function of the renderer(), activated only by a variable
         let timer3: Timer = Timer(fire: Date(), interval: 0.5, repeats: true, block: { timer3 in
 
             if (self.facePosition == "Face is centered" && self.faceOrientation == CheckFaceHelper.shared.headOn) {
@@ -299,6 +284,23 @@ class ARSessionManager: NSObject, ObservableObject {
         })
         timer2.tolerance = 0.4
         RunLoop.current.add(timer2, forMode: .default)
+    }
+    
+    func ontimer2Reset() {
+        // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
+        /// remind the user to position their head in the screen
+        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions) {
+            /// state user face and orientation if the face is in the screen
+            // TODO: fix this to actually find the face in the screen rather than just using the last face geometry that got stored
+            if (self.facePosition != "blank") {
+                self.soundHelper.announce(announcement: "\(self.facePosition), \(self.faceOrientation)")
+//                self.soundHelper.latestAnnouncement = self.facePosition + self.faceOrientation
+            } else {
+                self.soundHelper.announce(announcement: "please position your face in the screen")
+                self.soundHelper.latestAnnouncement = "please position your face in the screen"
+            }
+        }
+        self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
     }
     
     func fireTimer4() {
@@ -324,39 +326,22 @@ class ARSessionManager: NSObject, ObservableObject {
         RunLoop.current.add(timer5, forMode: .default)
     }
     
-    func ontimer2Reset() {
-        
-        // future iteration: say specifically what the probelm is. lighting, user needs to rotate a bit further, too far from screen, etc.
-        /// remind the user to position their head in the screen
-        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions) {
-            /// state user face and orientation if the face is in the screen
-            // TODO: fix this to actually find the face in the screen rather than just using the last face geometry that got stored
-            if (self.facePosition != "blank") {
-                self.soundHelper.announce(announcement: "\(self.facePosition), \(self.faceOrientation)")
-//                self.soundHelper.latestAnnouncement = self.facePosition + self.faceOrientation
-            } else {
-                self.soundHelper.announce(announcement: "please position your face in the screen")
-                self.soundHelper.latestAnnouncement = "please position your face in the screen"
-            }
-        }
-        self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
-    }
-    
     
     /// this is called to save the first batch of textures, right when the app is opened
     private func saveTextures1() {
-        collectFaceImage(whichImage: 0, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn1")
-        collectFaceImage(whichImage: 1, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft1")
-        collectFaceImage(whichImage: 2, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight1")
+        collectFaceImage(whichImage: 0, expectedImage: CheckFaceHelper.shared.rotatedSlightLeft, fileName: "SlightLeft1")
+        collectFaceImage(whichImage: 1, expectedImage: CheckFaceHelper.shared.rotatedSlightRight, fileName: "SlightRight1")
+        collectFaceImage(whichImage: 2, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft1")
+        collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight1")
     }
     
     /// this is called every frame to save the second batch of textures, when the user clicks the button
     private func saveTextures2() {
         // TODO: check to make sure the snapshots are actually good
-        
-        collectFaceImage(whichImage: 3, expectedImage: CheckFaceHelper.shared.headOn, fileName: "HeadOn2")
-        collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
-        collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
+        collectFaceImage(whichImage: 4, expectedImage: CheckFaceHelper.shared.rotatedSlightLeft, fileName: "SlightLeft2")
+        collectFaceImage(whichImage: 5, expectedImage: CheckFaceHelper.shared.rotatedSlightRight, fileName: "SlightRight2")
+        collectFaceImage(whichImage: 6, expectedImage: CheckFaceHelper.shared.rotatedLeft, fileName: "RotatedLeft2")
+        collectFaceImage(whichImage: 7, expectedImage: CheckFaceHelper.shared.rotatedRight, fileName: "RotatedRight2")
     }
     
     
@@ -365,6 +350,7 @@ class ARSessionManager: NSObject, ObservableObject {
         if (!faceImagesCollected[whichImage]) {
             if (CheckFaceHelper.shared.checkOrientationOfFace(transformMatrix: faceAnchorTransform) == expectedImage) {
                 faceImagesCollected[whichImage] = true
+                print("stored image at \(fileName)")
                 
                 /// need to have a slight delay so the very first image collected isn't blank. Allow a few frames to go through first
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
@@ -381,7 +367,7 @@ class ARSessionManager: NSObject, ObservableObject {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
             // Supposedly, since the user's face is centered before the first image is being taken, this should make the images be good.....
-//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -392,14 +378,18 @@ class ARSessionManager: NSObject, ObservableObject {
                 do {
                     try data.write(to: url)
                     switch (fileName) {
-                    case "HeadOn1":
-                        headOnImgDirectory1 = url; break;
+                    case "SlightLeft1":
+                        slightLeftImgDirectory1 = url; break;
+                    case "SlightRight1":
+                        slightRightImgDirectory1 = url; break;
                     case "RotatedLeft1":
                         rotatedLeftImgDirectory1 = url; break;
                     case "RotatedRight1":
                         rotatedRightImgDirectory1 = url; break;
-                    case "HeadOn2":
-                        headOnImgDirectory2 = url; break;
+                    case "SlightLeft2":
+                        slightLeftImgDirectory2 = url; break;
+                    case "SlightRight2":
+                        slightRightImgDirectory2 = url; break;
                     case "RotatedLeft2":
                         rotatedLeftImgDirectory2 = url; break;
                     case "RotatedRight2":
@@ -472,12 +462,12 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         /// every frame, check if we have successfully collected the images. If not, try to collect them
-        if ((!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2]) && readyToCollectFaceImages) {
+        if ((!faceImagesCollected[0] || !faceImagesCollected[1] || !faceImagesCollected[2] || !faceImagesCollected[3]) && readyToCollectFaceImages) {
             
             saveTextures1()
             
             /// Finish collecting images. this runs once, right when the images just finished all getting collected
-            if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2]) {
+            if (faceImagesCollected[0] && faceImagesCollected[1] && faceImagesCollected[2] && faceImagesCollected[3]) {
                 
                 self.interruptVoiceover()       /// interrupt the face position/orientation voiceovers (since they rely on the shared SoundHelper instance)
                 
@@ -512,12 +502,12 @@ extension ARSessionManager: ARSCNViewDelegate {
         
         
         /// for when the user clicks the button
-        if ((generatingFaceTextures2) && (!faceImagesCollected[3] || !faceImagesCollected[4] || !faceImagesCollected[5])) {
+        if ((generatingFaceTextures2) && (!faceImagesCollected[4] || !faceImagesCollected[5] || !faceImagesCollected[6] || !faceImagesCollected[7])) {
             
             saveTextures2()
             
             /// Finish collecting images. this runs once immediately when the second batch of images just finished all getting collected
-            if (faceImagesCollected[3] && faceImagesCollected[4] && faceImagesCollected[5]) {
+            if (faceImagesCollected[4] && faceImagesCollected[5] && faceImagesCollected[6] && faceImagesCollected[7]) {
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 
                 /// hide the instructional image
