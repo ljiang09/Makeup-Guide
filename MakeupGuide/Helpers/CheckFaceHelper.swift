@@ -47,8 +47,8 @@ class CheckFaceHelper {
             && (transformMatrix[2][1] < -0.2)) {
             return rotatedSlightLeft
         }
-        if ((transformMatrix[0][1] < 0.98) && (transformMatrix[0][2] < -0.27)
-            && (transformMatrix[2][1] > 0.27)) {
+        if ((transformMatrix[0][1] < 0.98) && (transformMatrix[0][2] < -0.2)
+            && (transformMatrix[2][1] > 0.2)) {
             return rotatedSlightRight
         }
         
