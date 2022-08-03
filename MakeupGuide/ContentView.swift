@@ -93,38 +93,38 @@ struct ContentView : View {
                     .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
             }
             
-            Button(action: {
-                if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
-                    arManager.interruptVoiceover()
-                    soundHelpers.announce(announcement: "Voiceover is off")    // TODO: for some reason this isn't working, when i added the `soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)` below it broke
-                    
-                    voiceoverOn = false
-                    UserDefaults.standard.set(false, forKey: "VoiceoversOn")
-                } else {
-                    voiceoverOn = true
-                    UserDefaults.standard.set(true, forKey: "VoiceoversOn")
-                    soundHelpers.announce(announcement: "Voiceover is on")
-                    soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)    // TODO: this doesn't get announced either.. hrm
-                }
-            }) {
-                if (voiceoverOn) {
-                    Text("Turn voiceover off")
-                        .foregroundColor(.black)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 10)
-                            .foregroundColor(Color(red: 200/255, green: 200/255, blue: 200/255))
-                        )
-                } else {
-                    Text("Turn voiceover on")
-                        .foregroundColor(.black)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 10)
-                            .foregroundColor(Color(red: 80/255, green: 1, blue: 50/255))
-                        )
-                }
-            }
-            .padding()
-            .position(x: UIScreen.main.bounds.width * 3/4, y: UIScreen.main.bounds.height / 15)
+//            Button(action: {
+//                if (UserDefaults.standard.bool(forKey: "VoiceoversOn")) {
+//                    arManager.interruptVoiceover()
+//                    soundHelpers.announce(announcement: "Voiceover is off")    // TODO: for some reason this isn't working, when i added the `soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)` below it broke
+//
+//                    voiceoverOn = false
+//                    UserDefaults.standard.set(false, forKey: "VoiceoversOn")
+//                } else {
+//                    voiceoverOn = true
+//                    UserDefaults.standard.set(true, forKey: "VoiceoversOn")
+//                    soundHelpers.announce(announcement: "Voiceover is on")
+//                    soundHelpers.announce(announcement: soundHelpers.latestAnnouncement)    // TODO: this doesn't get announced either.. hrm
+//                }
+//            }) {
+//                if (voiceoverOn) {
+//                    Text("Turn voiceover off")
+//                        .foregroundColor(.black)
+//                        .padding()
+//                        .background(RoundedRectangle(cornerRadius: 10)
+//                            .foregroundColor(Color(red: 200/255, green: 200/255, blue: 200/255))
+//                        )
+//                } else {
+//                    Text("Turn voiceover on")
+//                        .foregroundColor(.black)
+//                        .padding()
+//                        .background(RoundedRectangle(cornerRadius: 10)
+//                            .foregroundColor(Color(red: 80/255, green: 1, blue: 50/255))
+//                        )
+//                }
+//            }
+//            .padding()
+//            .position(x: UIScreen.main.bounds.width * 3/4, y: UIScreen.main.bounds.height / 15)
         }
     }
     
