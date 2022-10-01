@@ -355,6 +355,7 @@ class ARSessionManager: NSObject, ObservableObject {
                 /// need to have a slight delay so the very first image collected isn't blank. Allow a few frames to go through first
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                     self.exportTextureMap(fileName: fileName)
+                    self.exportSnapshot(fileName: "\(fileName)\(whichImage)")
                 }
             }
         }
@@ -367,7 +368,7 @@ class ARSessionManager: NSObject, ObservableObject {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
             // Supposedly, since the user's face is centered before the first image is being taken, this should make the images be good.....
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             
             // access documents directory
             let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -411,6 +412,37 @@ class ARSessionManager: NSObject, ObservableObject {
         }
     }
     
+    
+    // MARK: send a set of regular images alongside the unwrapped textures
+    /// fileName is the name you want to reference the file with, and the name to which it is saved on the UserDefaults
+    private func exportSnapshot(fileName: String) {
+        // keep this in so that you still have it to easily compare it
+        let image = sceneView.snapshot()
+        
+        guard let imageBuffer = sceneView.session.currentFrame?.capturedImage,
+              let cameraTransform = sceneView.session.currentFrame?.camera.transform,
+              let cameraIntrinsics = sceneView.session.currentFrame?.camera.intrinsics else {
+            print("error with getting camera image and transform data")
+            return
+        }
+        
+        // upload the image buffer to firebase
+        if let data = imageBuffer.toUIImage()?.pngData() {
+            FirebaseHelpers.upload(imageData: data, fileName: "\(fileName)ImageBuffer")
+        }
+        
+        // upload the 2D image to firebase
+        if let data: Data = image.pngData() {
+            /// send the image to Firebase to be stored
+            FirebaseHelpers.upload(imageData: data, fileName: fileName)
+        }
+        
+        // Upload a data file with all the ARFaceGeometry information
+        FirebaseHelpers.upload(fileName: fileName, cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+        
+        // upload camera intristics, camera transforms
+        
+    }
 }
 
 

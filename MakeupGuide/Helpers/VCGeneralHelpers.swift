@@ -11,6 +11,7 @@ It also holds extensions
 import ARKit
 import SwiftUI
 import SceneKit
+import VideoToolbox
 
 
 class GeneralHelpers: ObservableObject {
@@ -78,5 +79,14 @@ extension SCNMatrix4 {
         m42 = Float(affineTransform.ty)
         m33 = 1
         m44 = 1
+    }
+}
+
+
+extension CVPixelBuffer {
+    func toUIImage() -> UIImage? {
+        var cgImage: CGImage?
+        VTCreateCGImageFromCVPixelBuffer(self, options: nil, imageOut: &cgImage)
+        return cgImage.map{UIImage(cgImage: $0)}
     }
 }
