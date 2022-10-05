@@ -49,7 +49,6 @@ class GeneralHelpers: ObservableObject {
 
 
 class Images {
-    let neckRotationImage = Image("NeckRotation")
     let checkMark = Image("CheckMark")
 }
 

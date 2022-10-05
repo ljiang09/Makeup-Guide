@@ -41,7 +41,7 @@ class FirebaseHelpers {
     }
     
     
-    // temporarily used to upload ARFaceGeometry data alongside the 4 face textures and 2d images
+    /// used to upload ARFaceGeometry data alongside the 4 face textures and 2d images
     public static func upload(fileName: String, cameraTransform: simd_float4x4, cameraIntrinsics: simd_float3x3) {
         @ObservedObject var generalHelpers = GeneralHelpers.shared
         let sessionData = LogSessionData.shared

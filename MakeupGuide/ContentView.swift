@@ -75,17 +75,6 @@ struct ContentView : View {
                 }
             }
             
-            
-            if (arManager.isNeckImageShowing) {
-                Images().neckRotationImage
-                    .resizable()
-                    .frame(width: 200, height: 200)
-                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
-                    .onDisappear {
-                        showCheckImage()
-                    }
-            }
-            
             if ((self.showingCheckImage) || (arManager.isCheckImageShowing)) {
                 Images().checkMark
                     .resizable()

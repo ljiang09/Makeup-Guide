@@ -23,7 +23,6 @@ class ARSessionManager: NSObject, ObservableObject {
     private let faceTextureSize = 1024 //px
     
     @Published var isCheckMakeupButtonShowing: Bool     // represents the button on the ContentView to get a second batch of images
-    @Published var isNeckImageShowing: Bool
     @Published var isCheckImageShowing: Bool
     @Published var generatingFaceTextures2: Bool        // indicates the user wants to generate the second set of textures
     @Published var isTextShowing: Bool = false          // toggled every time a long voiceover is read and needs to be displayed as text on the screen
@@ -57,7 +56,6 @@ class ARSessionManager: NSObject, ObservableObject {
     
     private override init() {
         isCheckMakeupButtonShowing = false
-        isNeckImageShowing = false
         isCheckImageShowing = false
         generatingFaceTextures2 = false
         super.init()
@@ -65,7 +63,6 @@ class ARSessionManager: NSObject, ObservableObject {
         sceneView.session.run(ARFaceTrackingConfiguration())
         sceneView.delegate = self
         
-        // TODO: test whether having fill mesh true/false is more accurate
         self.scnFaceGeometry = ARSCNFaceGeometry(device: self.sceneView.device!, fillMesh: true)
         
         self.faceUvGenerator = FaceTextureGenerator(
@@ -141,18 +138,18 @@ class ARSessionManager: NSObject, ObservableObject {
                     /// if the user successfully positions their face (which is when this completion runs), state the instructions after 0.8 s for the user to rotate their head around and such
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.isCheckImageShowing = false
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                        self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
+                        self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
+                        // TODO: check if this latest announcement is shown on the screen
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            self.isNeckImageShowing = true
-                            self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
-                            self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
-                            
-                            /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
-                            self.firetimer2()
-                            
-                            print("face image collections should be happening now")
-                            self.readyToCollectFaceImages = true
-                        }
+                        /// start the 2nd timer, which reminds the user every 8 seconds to rotate their head
+                        self.firetimer2()
+                        
+                        print("face image collections should be happening now")
+                        self.readyToCollectFaceImages = true
                     }
                 }
             })
@@ -216,7 +213,6 @@ class ARSessionManager: NSObject, ObservableObject {
                         self.isCheckImageShowing = false
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            self.isNeckImageShowing = true
                             self.soundHelper.announce(announcement: self.soundHelper.rotateHeadInstructions)
                             self.soundHelper.latestAnnouncement = self.soundHelper.rotateHeadInstructions
                             
@@ -507,7 +503,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 /// hide the instructional image and show the "check makeup" button + text
                 DispatchQueue.main.async {
-                    self.isNeckImageShowing = false
                     self.isCheckMakeupButtonShowing = true
                 }
                 if (timer2 != nil) {
@@ -544,7 +539,6 @@ extension ARSessionManager: ARSCNViewDelegate {
                 
                 /// hide the instructional image
                 DispatchQueue.main.async {
-                    self.isNeckImageShowing = false
                     self.generatingFaceTextures2 = false
                 }
                 

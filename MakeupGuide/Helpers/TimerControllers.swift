@@ -5,4 +5,9 @@
 //  Created by Lily Jiang on 7/25/22.
 //
 
-import Foundation
+
+class TimerController {
+    static var shared = TimerController()
+    
+    
+}
