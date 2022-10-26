@@ -41,25 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     /// runs when the app session ends
     func applicationWillTerminate(_ application: UIApplication) {
-        // delete the face texture images that were used during the session
-        let possibleDirectories = [arManager.slightLeftImgDirectory1,
-                                   arManager.slightRightImgDirectory1,
-                                   arManager.rotatedLeftImgDirectory1,
-                                   arManager.rotatedRightImgDirectory1,
-                                   arManager.slightLeftImgDirectory2,
-                                   arManager.slightRightImgDirectory2,
-                                   arManager.rotatedLeftImgDirectory2,
-                                   arManager.rotatedRightImgDirectory2]
-        possibleDirectories.forEach { value in
-            if (value != nil) {
-                do {
-                    try FileManager.default.removeItem(at: value!)
-//                    print("deleted image from Documents directory")
-                } catch {
-                    print("Could not clear temp folder: \(error)")
-                }
-            }
-        }
+        // note to self: don't need to delete things from the directory because we're not storing things in the documents anymore
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
