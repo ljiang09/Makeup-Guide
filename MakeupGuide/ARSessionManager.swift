@@ -117,12 +117,22 @@ class ARSessionManager: NSObject, ObservableObject {
         isTextShowing = true
         isSkipButtonShowing2 = true
         
-        // announce the instructions. On completion, start flow of centering the user's face in the screen
-        self.soundHelper.announce(announcement: announcement) {
-            self.centerFaceFlow()
+        
+        // have to delay it a bit so the announcement manager can catch up. Otherwise, it'll think the completion is reached when the first announcment is done
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // announce the instructions. On completion, start flow of centering the user's face in the screen
+            self.soundHelper.announce(announcement: announcement) {
+                self.isTextShowing = false
+                self.centerFaceFlow()
+                
+                // TODO: start timer to send analytics to firebase every 10 seconds
+            }
         }
-        
-        
+    }
+    
+    
+    
+    func centerFaceFlow() {
         // MARK: New UX flow:
         // center face in the screen, IMMEDIATE feedback for this one
         // possibly also tell them how far away they are from the screen, and encourage them to move their phone forwards/backwards
@@ -131,17 +141,8 @@ class ARSessionManager: NSObject, ObservableObject {
         // say "Turn your head slightly right" wait 1 second, then capture image and play sound
         // say "turn your head more right." wait 1 second, then capture image and play sound
         
+        print("centering face")
         
-//        self.soundHelper.announce(announcement: announcement) {
-//            self.isTextShowing = false
-//            self.fireTimer4()   // start the face data collection, and use a timer to limit it to every 0.5 seconds
-//            self.fireTimer5()   // set timer to send analytics to firebase every 10 seconds
-//        }
-    }
-    
-    
-    
-    func centerFaceFlow() {
         self.checkFaceUntilRepositioned(whichPosition: self.facePositions[4]) {
             
             // signal success in repositioning face
@@ -264,11 +265,18 @@ class ARSessionManager: NSObject, ObservableObject {
     /// runs a short timer where in every loop, the desired face position is checked against the current face position
     /// This current face position is updated every frame by the renderer delegate function
     func checkFaceUntilRepositioned(whichPosition: String, completion: @escaping () -> Void) {
+        
+        print("checking face until repositioned")
+        
         // tell the renderer to start checking the face transforms
         checkingFaceCentered = true
         
         let faceCheckTimer = Timer(fire: Date(), interval: 0.25, repeats: true) { faceCheckTimer in
             // continually compare the updated face position to the desired face position
+            
+            print("new face transform: \(self.faceTransform)")
+            print("new face position: \(self.facePosition)")
+            
             if whichPosition == self.facePosition {
                 faceCheckTimer.invalidate()
                 completion()
