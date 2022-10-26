@@ -40,40 +40,67 @@ struct ContentView : View {
                     
                     Spacer()
                     
-                    Button(action: {
-                        arManager.interruptVoiceover()
-                    }, label: {
-                        Text("Done")
-                            .padding(30)
-                            .font(.system(size: UIScreen.main.bounds.width/13))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                    })
-                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+                    if arManager.isSkipButtonShowing1 {
+                        Button(action: {
+                            soundHelpers.interruptVoiceover() {
+                                arManager.isSkipButtonShowing1 = false
+                                
+                                arManager.appIntro2()
+                            }
+                        }, label: {
+                            Text("Done")
+                                .padding(30)
+                                .font(.system(size: UIScreen.main.bounds.width/13))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                        })
+                        .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+                    } else if arManager.isSkipButtonShowing2 {
+                        Button(action: {
+                            soundHelpers.interruptVoiceover() {
+                                arManager.isTextShowing = false
+                                arManager.isSkipButtonShowing2 = false
+                                
+                                arManager.centerFaceFlow()
+                            }
+                        }, label: {
+                            Text("Done")
+                                .padding(30)
+                                .font(.system(size: UIScreen.main.bounds.width/13))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                        })
+                        .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+                    }
                 }
             }
             
-            if ((arManager.isCheckMakeupButtonShowing) && (!arManager.generatingFaceTextures2)) {
-                VStack {
-                    Spacer()
-                    
-                    Button(action: {
-                        arManager.setGeneratingFaceTextures2()
-                        sessionData.log(whichButton: "Check your makeup")
-                    }, label: {
-                        Text("Check your makeup")
-                            .padding(30)
-                            .font(.system(size: UIScreen.main.bounds.width/13))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                    })
-                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
-                }
-            }
+            
+            
+            /// check makeup button
+//            if ((arManager.isCheckMakeupButtonShowing) && (!arManager.generatingFaceTextures2)) {
+//                VStack {
+//                    Spacer()
+//
+//                    Button(action: {
+//                        arManager.setGeneratingFaceTextures2()
+//                        sessionData.log(whichButton: "Check your makeup")
+//                    }, label: {
+//                        Text("Check your makeup")
+//                            .padding(30)
+//                            .font(.system(size: UIScreen.main.bounds.width/13))
+//                            .foregroundColor(.black)
+//                            .frame(maxWidth: .infinity)
+//                            .background(Color.white)
+//                            .clipShape(RoundedRectangle(cornerRadius: 20))
+//                    })
+//                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+//                }
+//            }
             
             if ((self.showingCheckImage) || (arManager.isCheckImageShowing)) {
                 Images().checkMark

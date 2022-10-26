@@ -169,6 +169,13 @@ class SoundHelper: NSObject {
     }
     
     
+    func interruptVoiceover(completion: @escaping ()->()) {
+        synthesizer.stopSpeaking(at: .immediate)
+        // TODO: clear the queue here within the function rather than just calling this fxn twice when needed
+        
+        completion()
+    }
+    
 }
 
 
