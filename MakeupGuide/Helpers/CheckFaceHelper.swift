@@ -6,6 +6,8 @@ Created by Lily Jiang on 6/10/22
 This file holds 2 helper functions to check face position and orientation
 */
 
+import Darwin
+
 
 
 enum FaceOrientations: String {
@@ -22,49 +24,84 @@ class CheckFaceHelper {
     static let shared: CheckFaceHelper = CheckFaceHelper()
     
     
-    static let centeredThreshold: Float = 0.1  // this bounds the center radius
-    static let slightlyThreshold: Float = 0.3  // this and the centered threshold bound the slightly left/right
+    let centeredThreshold: Float = 0.1  // this bounds the center radius
+    let slightlyThreshold: Float = 0.3  // this and the centered threshold bound the slightly left/right
     
     /// gets the orientation of the face (tilt, rotated left, etc)
-    static func getOrientation(faceTransform: [[Float]]) {
-        // horizontal orientations
-        if -centeredThreshold...centeredThreshold ~= faceTransform[0][2] {
-            print("centered in the horizontal direction")
-        } else if -centeredThreshold...centeredThreshold ~= faceTransform[2][1] {
-            print("centered in the horizontal direction")
-        }
+    func getOrientation(faceTransform: [[Float]]) {
+        let horizontal = self.getHorizontalOrientation(faceTransform: faceTransform)
+        let vertical = self.getVerticalOrientation(faceTransform: faceTransform)
         
-        if faceTransform[0][2] < -slightlyThreshold {
-            print("face is turned right")
-        }
-        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[0][2] {
-            print("face is turned slightly right")
-        }
-        if faceTransform[0][2] > slightlyThreshold {
-            print("face is turned left")
-        }
-        if centeredThreshold...slightlyThreshold ~= faceTransform[0][2] {
-            print("face is turned slightly left")
-        }
+        // convert to polar coordinates. will give us quadrant and magnitude
+        let radius = sqrt(horizontal*horizontal + vertical*vertical)
+        let angle = atan(vertical/horizontal) * (180 / 3.141)    // in degrees
         
-        
-        // vertical orientations
-        if -centeredThreshold...centeredThreshold ~= faceTransform[1][2] {
-            print("centered in the vertical direction")
-        }
-        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[1][2] {
-            print("face is slightly tilted up")
-        }
-        if faceTransform[1][2] < -slightlyThreshold {
-            print("face is tilted up")
-        }
-        if centeredThreshold...slightlyThreshold ~= faceTransform[1][2] {
-            print("face is slightly tilted down")
-        }
-        if faceTransform[1][2] > centeredThreshold {
-            print("face is tilted down")
+        if radius < centeredThreshold {
+            print("face is centered!")
+        } else  {
+            // arctan goes from -90 to 90, so check that range and distinguish the quadrant based on the components' signs
+            // note that the angle is kinda flipped.. since the positive horizontal is towards the left, and positive vertical is towards the bottom
+            if (-90)...0 ~= angle {
+                if horizontal < 0 {
+                    print("Quadrant 4")
+                } else {
+                    print("Quadrant 2")
+                }
+            } else {
+                // angle is betwen 0 and +90
+                if horizontal < 0 {
+                    print("Quadrant 1")
+                } else {
+                    print("Quadrant 3")
+                }
+            }
         }
     }
+    
+    private func getHorizontalOrientation(faceTransform: [[Float]]) -> Float {
+//        if -centeredThreshold...centeredThreshold ~= faceTransform[0][2] {
+//            print("centered in the horizontal direction")
+//        } else if -centeredThreshold...centeredThreshold ~= faceTransform[2][1] {
+//            print("centered in the horizontal direction")
+//        }
+//
+//        if faceTransform[0][2] < -slightlyThreshold {
+//            print("face is turned right")
+//        }
+//        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[0][2] {
+//            print("face is turned slightly right")
+//        }
+//        if faceTransform[0][2] > slightlyThreshold {
+//            print("face is turned left")
+//        }
+//        if centeredThreshold...slightlyThreshold ~= faceTransform[0][2] {
+//            print("face is turned slightly left")
+//        }
+        
+        return faceTransform[0][2]
+    }
+    
+    
+    private func getVerticalOrientation(faceTransform: [[Float]]) -> Float {
+//        if -centeredThreshold...centeredThreshold ~= faceTransform[1][2] {
+//            print("centered in the vertical direction")
+//        }
+//        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[1][2] {
+//            print("face is slightly tilted up")
+//        }
+//        if faceTransform[1][2] < -slightlyThreshold {
+//            print("face is tilted up")
+//        }
+//        if centeredThreshold...slightlyThreshold ~= faceTransform[1][2] {
+//            print("face is slightly tilted down")
+//        }
+//        if faceTransform[1][2] > centeredThreshold {
+//            print("face is tilted down")
+//        }
+        
+        return faceTransform[1][2]
+    }
+    
 
 
     
