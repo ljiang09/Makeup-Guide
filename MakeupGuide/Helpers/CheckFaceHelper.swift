@@ -37,22 +37,66 @@ class CheckFaceHelper {
         let angle = atan(vertical/horizontal) * (180 / 3.141)    // in degrees
         
         if radius < centeredThreshold {
+            // face is centered
             print("face is centered!")
-        } else  {
+        } else if centeredThreshold...slightlyThreshold ~= radius {
             // arctan goes from -90 to 90, so check that range and distinguish the quadrant based on the components' signs
             // note that the angle is kinda flipped.. since the positive horizontal is towards the left, and positive vertical is towards the bottom
-            if (-90)...0 ~= angle {
-                if horizontal < 0 {
-                    print("Quadrant 4")
-                } else {
-                    print("Quadrant 2")
+            
+            // there are 8 "sections" to consider, so divide by 45 degree segments
+            if horizontal < 0 {
+                // face is turned in the general right direction
+                if -22.5...22.5 ~= angle {
+                    print("face is turned slightly right")
+                } else if 22.5...67.5 ~= angle {
+                    print("face is slightly tilted up and turned right")
+                } else if 67.5...90 ~= angle {
+                    print("face is slightly tilted up")
+                } else if (-67.5)...(-22.5) ~= angle {
+                    print("face is slightly tilted down and turned right")
+                } else if (-90)...(-67.5) ~= angle {
+                    print("face is slightly tilted down")
                 }
             } else {
-                // angle is betwen 0 and +90
-                if horizontal < 0 {
-                    print("Quadrant 1")
-                } else {
-                    print("Quadrant 3")
+                // face is turned in the general left direction
+                if -22.5...22.5 ~= angle {
+                    print("face is slightly turned left")
+                } else if 22.5...67.5 ~= angle {
+                    print("face is slightly tilted down and turned left")
+                } else if 67.5...90 ~= angle {
+                    print("face is slightly tilted down")
+                } else if (-67.5)...(-22.5) ~= angle {
+                    print("face is slightly tilted up and turned left")
+                } else if (-90)...(-67.5) ~= angle {
+                    print("face is slightly tilted up")
+                }
+            }
+        } else {
+            if horizontal < 0 {
+                // face is turned in the general right direction
+                if -22.5...22.5 ~= angle {
+                    print("face is turned right")
+                } else if 22.5...67.5 ~= angle {
+                    print("face is tilted up and turned right")
+                } else if 67.5...90 ~= angle {
+                    print("face is tilted up")
+                } else if (-67.5)...(-22.5) ~= angle {
+                    print("face is tilted down and turned right")
+                } else if (-90)...(-67.5) ~= angle {
+                    print("face is tilted down")
+                }
+            } else {
+                // face is turned in the general left direction
+                if -22.5...22.5 ~= angle {
+                    print("face is turned left")
+                } else if 22.5...67.5 ~= angle {
+                    print("face is tilted down and turned left")
+                } else if 67.5...90 ~= angle {
+                    print("face is tilted down")
+                } else if (-67.5)...(-22.5) ~= angle {
+                    print("face is tilted up and turned left")
+                } else if (-90)...(-67.5) ~= angle {
+                    print("face is tilted up")
                 }
             }
         }
