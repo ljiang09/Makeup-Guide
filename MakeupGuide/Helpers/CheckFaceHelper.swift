@@ -22,35 +22,46 @@ class CheckFaceHelper {
     static let shared: CheckFaceHelper = CheckFaceHelper()
     
     
+    static let centeredThreshold: Float = 0.1  // this bounds the center radius
+    static let slightlyThreshold: Float = 0.3  // this and the centered threshold bound the slightly left/right
+    
     /// gets the orientation of the face (tilt, rotated left, etc)
     static func getOrientation(faceTransform: [[Float]]) {
-        if -0.1...0.1 ~= faceTransform[0][2] {
+        // horizontal orientations
+        if -centeredThreshold...centeredThreshold ~= faceTransform[0][2] {
             print("centered in the horizontal direction")
-        } else if -0.1...0.1 ~= faceTransform[2][1] {
+        } else if -centeredThreshold...centeredThreshold ~= faceTransform[2][1] {
             print("centered in the horizontal direction")
         }
         
-        if faceTransform[0][2] < -0.3 {
+        if faceTransform[0][2] < -slightlyThreshold {
             print("face is turned right")
         }
-        if -0.3 ... -0.1 ~= faceTransform[0][2] {
+        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[0][2] {
             print("face is turned slightly right")
         }
-        if faceTransform[0][2] > 0.3 {
+        if faceTransform[0][2] > slightlyThreshold {
             print("face is turned left")
         }
-        if 0.1...0.3 ~= faceTransform[0][2] {
+        if centeredThreshold...slightlyThreshold ~= faceTransform[0][2] {
             print("face is turned slightly left")
         }
         
         
-        if -0.1...0.1 ~= faceTransform[1][2] {
+        // vertical orientations
+        if -centeredThreshold...centeredThreshold ~= faceTransform[1][2] {
             print("centered in the vertical direction")
         }
-        if faceTransform[1][2] < -0.1 {
+        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[1][2] {
+            print("face is slightly tilted up")
+        }
+        if faceTransform[1][2] < -slightlyThreshold {
             print("face is tilted up")
         }
-        if faceTransform[1][2] > 0.1 {
+        if centeredThreshold...slightlyThreshold ~= faceTransform[1][2] {
+            print("face is slightly tilted down")
+        }
+        if faceTransform[1][2] > centeredThreshold {
             print("face is tilted down")
         }
     }
