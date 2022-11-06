@@ -11,6 +11,7 @@ import SceneKit
 import ARKit
 import UIKit
 
+
 class ARSessionManager: NSObject, ObservableObject {
     static var shared: ARSessionManager = ARSessionManager()
     
@@ -33,15 +34,14 @@ class ARSessionManager: NSObject, ObservableObject {
     @Published var isSkipButtonShowing2: Bool = false
     
     var faceTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]    // update face anchor transform when the session is collecting face info
-    var facePosition: String? = nil    // update the face position based on the Face Anchor Transform
+    var facePosition: FaceOrientations? = nil    // update the face position based on the Face Anchor Transform
     
     // fill this out as you collect the images
-    var faceImages: [UIImage] = []  // slightly left, left, slightly right, right, center
-    let facePositions = ["slightlyLeft", "left", "slightlyRight", "right", "center"]
+    var faceImages: [FaceOrientations: UIImage] = [:]  // slightly left, left, slightly right, right, center
     
     // change tehse variables to tell the delegate renderer function to do stuff
     var checkingFaceCentered: Bool = false
-    var imageBeingCollected: String? = nil    // represents which image the ar session should be trying to capture
+    var imageBeingCollected: FaceOrientations? = nil    // represents which image the ar session should be trying to capture
     
     
     private override init() {
@@ -133,54 +133,51 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     func centerFaceFlow() {
-        // MARK: New UX flow:
-        // center face in the screen, IMMEDIATE feedback for this one
+        // NOTES: possible improvements to be made
         // possibly also tell them how far away they are from the screen, and encourage them to move their phone forwards/backwards
-        // Once centered, say "Your face is now centered. Turn your head slightly left." Wait 1 second, then capture image.
-        // Say "Turn your head more left". Wait 1 second, then capture image.
-        // say "Turn your head slightly right" wait 1 second, then capture image and play sound
-        // say "turn your head more right." wait 1 second, then capture image and play sound
         
         print("centering face")
         
-        self.checkFaceUntilRepositioned(whichPosition: self.facePositions[4]) {
-            
-            // signal success in repositioning face
+        // 1. center face with immediate feedback
+        self.checkFaceUntilRepositioned(whichPosition: FaceOrientations.center) {
             self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
             self.isCheckImageShowing = true
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 self.isCheckImageShowing = false
                 
                 self.soundHelper.announce(announcement: "Face is now centered.") {
-                    self.collectImageStart(whichImage: 0) {
+                    // 2. capture images in order
+                    self.collectImageStart(whichImage: FaceOrientations.slightlyLeft) {
                         print("collected slightly left")
-                        self.collectImageStart(whichImage: 1) {
+                        self.collectImageStart(whichImage: FaceOrientations.left) {
                             print("collected left")
-                            self.collectImageStart(whichImage: 2) {
+                            self.collectImageStart(whichImage: FaceOrientations.slightlyRight) {
                                 print("collected slightly right")
-                                self.collectImageStart(whichImage: 3) {
+                                self.collectImageStart(whichImage: FaceOrientations.right) {
                                     print("collected right. Done")
                                 }
                             }
                         }
                     }
                 }
-                
             }
         }
     }
     
     
-    // instructs the user to turn their head to a specified orientation, then waits 1 second before taking the picture
-    func collectImageStart(whichImage: Int, completion: @escaping ()->()) {
+    /// instructs the user to turn their head to a specified orientation, then waits 1 second before taking the picture
+    func collectImageStart(whichImage: FaceOrientations, completion: @escaping ()->()) {
+        print("collecting image \(whichImage.rawValue)")
+        
         // state the instructions
         // TODO: check if this latest announcement is shown on the screen
-        var announcement = "Turn your head \(facePositions[whichImage]) until you hear the success sound. Then, hold your head in place."
+        var announcement = "Turn your head \(whichImage.rawValue) until you hear the success sound. Then, hold your head in place."
         self.soundHelper.latestAnnouncement = announcement
         self.soundHelper.announce(announcement: announcement) {
             
             // check face until slightly left. in the completion, run success sound and such
-            self.checkFaceUntilRepositioned(whichPosition: self.facePositions[whichImage]) {
+            self.checkFaceUntilRepositioned(whichPosition: whichImage) {
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 self.isCheckImageShowing = true
                 
@@ -191,7 +188,7 @@ class ARSessionManager: NSObject, ObservableObject {
                     self.soundHelper.latestAnnouncement = announcement
                     self.soundHelper.announce(announcement: announcement) {
                         // change the optional variable to indicate that the renderer should look for the specified position
-                        self.imageBeingCollected = self.facePositions[whichImage]
+                        self.imageBeingCollected = whichImage
                         
                         // NOTE: Eventually you can check if the user has successfully held their face still for that long (probably w/ a timer)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -212,8 +209,8 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     /// given the face transform and texture, extracts and saves the UV texture
-    /// `whichImage` corresponds to `facePositions`
-    func collectTexture(whichImage: Int) {
+    /// `whichImage` corresponds to `FaceOrientations`
+    func collectTexture(whichImage: FaceOrientations) {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
             // Supposedly, since the user's face is centered before the first image is being taken, this should make the images be good.....
@@ -222,7 +219,7 @@ class ARSessionManager: NSObject, ObservableObject {
             // save the image in the class variable, accessible through the shared singleton
             self.faceImages[whichImage] = uiImage
             
-            let fileName: String = "\(facePositions[whichImage])"
+            let fileName: String = whichImage.rawValue
             
             /// send the image to Firebase to be stored
             FirebaseHelpers.upload(imageData: uiImage.pngData()!, fileName: fileName)
@@ -235,7 +232,7 @@ class ARSessionManager: NSObject, ObservableObject {
     
     
     /// collects image as directly seen in the screen
-    func collect2DImage(whichImage: Int) {
+    func collect2DImage(whichImage: FaceOrientations) {
         // collects image as directly seen in the screen
         guard let imageBuffer = sceneView.session.currentFrame?.capturedImage else {
             print("error with getting camera image")
@@ -244,13 +241,13 @@ class ARSessionManager: NSObject, ObservableObject {
 
         // upload the image buffer to firebase
         if let data = imageBuffer.toUIImage()?.pngData() {
-            FirebaseHelpers.upload(imageData: data, fileName: "\(facePositions[whichImage])ImageBuffer")
+            FirebaseHelpers.upload(imageData: data, fileName: "\(whichImage.rawValue)ImageBuffer")
         }
     }
     
     
     /// collects and uploads the data into firebase
-    func collectImageData(whichImage: Int) {
+    func collectImageData(whichImage: FaceOrientations) {
         // Upload a data file with all the camera information
         guard let cameraTransform = sceneView.session.currentFrame?.camera.transform,
               let cameraIntrinsics = sceneView.session.currentFrame?.camera.intrinsics else {
@@ -258,13 +255,13 @@ class ARSessionManager: NSObject, ObservableObject {
             return
         }
         
-        FirebaseHelpers.upload(fileName: "\(facePositions[whichImage])CameraInfo", cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+        FirebaseHelpers.upload(fileName: "\(whichImage.rawValue)CameraInfo", cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
     }
     
     
     /// runs a short timer where in every loop, the desired face position is checked against the current face position
     /// This current face position is updated every frame by the renderer delegate function
-    func checkFaceUntilRepositioned(whichPosition: String, completion: @escaping () -> Void) {
+    func checkFaceUntilRepositioned(whichPosition: FaceOrientations, completion: @escaping () -> Void) {
         
         print("checking face until repositioned")
         
@@ -274,8 +271,8 @@ class ARSessionManager: NSObject, ObservableObject {
         let faceCheckTimer = Timer(fire: Date(), interval: 0.25, repeats: true) { faceCheckTimer in
             // continually compare the updated face position to the desired face position
             
-            print("new face transform: \(self.faceTransform)")
-            print("new face position: \(self.facePosition)")
+            // MARK: uncomment this if you want to get data for the python analysis
+//            print(self.faceTransform)
             
             if whichPosition == self.facePosition {
                 faceCheckTimer.invalidate()
@@ -349,32 +346,8 @@ extension ARSessionManager: ARSCNViewDelegate {
                              [x[3][0], x[3][1], x[3][2], x[3][3]]]
             
             
-            let th1: Float = 0.9
-            let th2: Float = 0.3
-            let th3: Float = 0.5
+            CheckFaceHelper.getOrientation(faceTransform: faceTransform)
             
-            
-            // TODO: Oct 19 - test out the tolerances and make them tighter
-            if faceTransform[2][2] < 0.9 {
-                if ((faceTransform[0][1] < th1) && (faceTransform[0][2] > th2)
-                    && (faceTransform[2][1] < -th2)) {
-                    facePosition = "rotatedLeft"
-                } else
-                if ((faceTransform[0][1] < th1) && (faceTransform[0][2] < -th2)
-                    && (faceTransform[2][1] > th2)) {
-                    facePosition = "rotatedRight"
-                } else
-                if ((faceTransform[1][0] > -th1) && (faceTransform[1][2] > th3)
-                    && (faceTransform[2][0] > th3)) {
-                    facePosition = "tiltedForward"
-                } else
-                if ((faceTransform[1][0] > -th1) && (faceTransform[1][2] < -th3)
-                    && (faceTransform[2][0] < -th3)) {
-                    facePosition = "tiltedBackward"
-                } else {
-                    facePosition = nil
-                }
-            }
             
         }
         

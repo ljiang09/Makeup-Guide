@@ -7,55 +7,56 @@ This file holds 2 helper functions to check face position and orientation
 */
 
 
+
+enum FaceOrientations: String {
+    case slightlyLeft = "slightly left"
+    case left = "left"
+    case slightlyRight = "slightly right"
+    case right = "right"
+    case center = "center"
+}
+
+
+
 class CheckFaceHelper {
     static let shared: CheckFaceHelper = CheckFaceHelper()
     
-    let rotatedLeft = "Face is rotated left"
-    let rotatedRight = "Face is rotated right"
-    let rotatedSlightLeft = "Face is rotated slightly left"
-    let rotatedSlightRight = "Face is rotated slightly right"
-    let tiltedForward = "Face is tilted forward"
-    let tiltedBackward = "Face is tilted backward"
-    let headOn = "Face is head on"
     
-    func checkOrientationOfFace(transformMatrix: [[Float]]) -> String {
-        /// thresholds for the `if` statements
-        let th1: Float = 0.9
-        let th2: Float = 0.3
-        let th3: Float = 0.5
-        
-        if (transformMatrix[2][2] < th1) {
-            if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] > th2)
-                && (transformMatrix[2][1] < -th2)) {
-                return rotatedLeft
-            }
-            if ((transformMatrix[0][1] < th1) && (transformMatrix[0][2] < -th2)
-                && (transformMatrix[2][1] > th2)) {
-                return rotatedRight
-            }
-            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] > th3)
-                && (transformMatrix[2][0] > th3)) {
-                return tiltedForward
-            }
-            if ((transformMatrix[1][0] > -th1) && (transformMatrix[1][2] < -th3)
-                && (transformMatrix[2][0] < -th3)) {
-                return tiltedBackward
-            }
+    /// gets the orientation of the face (tilt, rotated left, etc)
+    static func getOrientation(faceTransform: [[Float]]) {
+        if -0.1...0.1 ~= faceTransform[0][2] {
+            print("centered in the horizontal direction")
+        } else if -0.1...0.1 ~= faceTransform[2][1] {
+            print("centered in the horizontal direction")
         }
         
-        if ((transformMatrix[0][1] < 0.98) && (transformMatrix[0][2] > 0.2)
-            && (transformMatrix[2][1] < -0.2)) {
-            return rotatedSlightLeft
+        if faceTransform[0][2] < -0.3 {
+            print("face is turned right")
         }
-        if ((transformMatrix[0][1] < 0.98) && (transformMatrix[0][2] < -0.2)
-            && (transformMatrix[2][1] > 0.2)) {
-            return rotatedSlightRight
+        if -0.3 ... -0.1 ~= faceTransform[0][2] {
+            print("face is turned slightly right")
+        }
+        if faceTransform[0][2] > 0.3 {
+            print("face is turned left")
+        }
+        if 0.1...0.3 ~= faceTransform[0][2] {
+            print("face is turned slightly left")
         }
         
-        return headOn
+        
+        if -0.1...0.1 ~= faceTransform[1][2] {
+            print("centered in the vertical direction")
+        }
+        if faceTransform[1][2] < -0.1 {
+            print("face is tilted up")
+        }
+        if faceTransform[1][2] > 0.1 {
+            print("face is tilted down")
+        }
     }
 
 
+    
     func checkPositionOfFace(transformMatrix: [[Float]]) -> String {
         let thresholds = returnThresholds(z: transformMatrix[3][2])
         
