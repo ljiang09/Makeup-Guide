@@ -9,12 +9,31 @@ This file holds 2 helper functions to check face position and orientation
 import Darwin
 
 
+enum FacePositions: String {
+    case left = "left"
+    case right = "right"
+    case bottom = "bottom"
+    case top = "top"
+    case center = "center"
+}
 
 enum FaceOrientations: String {
     case slightlyLeft = "slightly left"
-    case left = "left"
     case slightlyRight = "slightly right"
+    case slightlyUp = "slightly up"
+    case slightlyDown = "slightly down"
+    case slightlyUpLeft = "slightly up left"
+    case slightlyDownLeft = "slightly down left"
+    case slightlyUpRight = "slightly up right"
+    case slightlyDownRight = "slightly down right"
+    case left = "left"
     case right = "right"
+    case up = "up"
+    case down = "down"
+    case upLeft = "up left"
+    case downLeft = "down left"
+    case upRight = "up right"
+    case downRight = "down right"
     case center = "center"
 }
 
@@ -23,14 +42,19 @@ enum FaceOrientations: String {
 class CheckFaceHelper {
     static let shared: CheckFaceHelper = CheckFaceHelper()
     
+    var orientation: FaceOrientations? = nil
+    var position: FacePositions? = nil
     
     let centeredThreshold: Float = 0.1  // this bounds the center radius
     let slightlyThreshold: Float = 0.3  // this and the centered threshold bound the slightly left/right
     
-    /// gets the orientation of the face (tilt, rotated left, etc)
+    /// gets the orientation of the face (tilt, rotated left, etc), sets the variable to be accessed by the AR session manager
     func getOrientation(faceTransform: [[Float]]) {
         let horizontal = self.getHorizontalOrientation(faceTransform: faceTransform)
-        let vertical = self.getVerticalOrientation(faceTransform: faceTransform)
+        var vertical = self.getVerticalOrientation(faceTransform: faceTransform)
+        
+        // move the "center" slightly up
+        vertical = vertical + 0.08
         
         // convert to polar coordinates. will give us quadrant and magnitude
         let radius = sqrt(horizontal*horizontal + vertical*vertical)
@@ -39,6 +63,7 @@ class CheckFaceHelper {
         if radius < centeredThreshold {
             // face is centered
             print("face is centered!")
+            orientation = FaceOrientations.center
         } else if centeredThreshold...slightlyThreshold ~= radius {
             // arctan goes from -90 to 90, so check that range and distinguish the quadrant based on the components' signs
             // note that the angle is kinda flipped.. since the positive horizontal is towards the left, and positive vertical is towards the bottom
@@ -48,27 +73,37 @@ class CheckFaceHelper {
                 // face is turned in the general right direction
                 if -22.5...22.5 ~= angle {
                     print("face is turned slightly right")
+                    orientation = FaceOrientations.slightlyRight
                 } else if 22.5...67.5 ~= angle {
                     print("face is slightly tilted up and turned right")
+                    orientation = FaceOrientations.slightlyUpRight
                 } else if 67.5...90 ~= angle {
                     print("face is slightly tilted up")
+                    orientation = FaceOrientations.slightlyUp
                 } else if (-67.5)...(-22.5) ~= angle {
                     print("face is slightly tilted down and turned right")
+                    orientation = FaceOrientations.slightlyDownRight
                 } else if (-90)...(-67.5) ~= angle {
                     print("face is slightly tilted down")
+                    orientation = FaceOrientations.slightlyDown
                 }
             } else {
                 // face is turned in the general left direction
                 if -22.5...22.5 ~= angle {
                     print("face is slightly turned left")
+                    orientation = FaceOrientations.slightlyLeft
                 } else if 22.5...67.5 ~= angle {
                     print("face is slightly tilted down and turned left")
+                    orientation = FaceOrientations.slightlyDownLeft
                 } else if 67.5...90 ~= angle {
                     print("face is slightly tilted down")
+                    orientation = FaceOrientations.slightlyDown
                 } else if (-67.5)...(-22.5) ~= angle {
                     print("face is slightly tilted up and turned left")
+                    orientation = FaceOrientations.slightlyUpLeft
                 } else if (-90)...(-67.5) ~= angle {
                     print("face is slightly tilted up")
+                    orientation = FaceOrientations.slightlyUp
                 }
             }
         } else {
@@ -76,73 +111,49 @@ class CheckFaceHelper {
                 // face is turned in the general right direction
                 if -22.5...22.5 ~= angle {
                     print("face is turned right")
+                    orientation = FaceOrientations.right
                 } else if 22.5...67.5 ~= angle {
                     print("face is tilted up and turned right")
+                    orientation = FaceOrientations.upRight
                 } else if 67.5...90 ~= angle {
                     print("face is tilted up")
+                    orientation = FaceOrientations.up
                 } else if (-67.5)...(-22.5) ~= angle {
                     print("face is tilted down and turned right")
+                    orientation = FaceOrientations.downRight
                 } else if (-90)...(-67.5) ~= angle {
                     print("face is tilted down")
+                    orientation = FaceOrientations.down
                 }
             } else {
                 // face is turned in the general left direction
                 if -22.5...22.5 ~= angle {
                     print("face is turned left")
+                    orientation = FaceOrientations.left
                 } else if 22.5...67.5 ~= angle {
                     print("face is tilted down and turned left")
+                    orientation = FaceOrientations.downLeft
                 } else if 67.5...90 ~= angle {
                     print("face is tilted down")
+                    orientation = FaceOrientations.down
                 } else if (-67.5)...(-22.5) ~= angle {
                     print("face is tilted up and turned left")
+                    orientation = FaceOrientations.upLeft
                 } else if (-90)...(-67.5) ~= angle {
                     print("face is tilted up")
+                    orientation = FaceOrientations.up
                 }
             }
         }
     }
     
+    
     private func getHorizontalOrientation(faceTransform: [[Float]]) -> Float {
-//        if -centeredThreshold...centeredThreshold ~= faceTransform[0][2] {
-//            print("centered in the horizontal direction")
-//        } else if -centeredThreshold...centeredThreshold ~= faceTransform[2][1] {
-//            print("centered in the horizontal direction")
-//        }
-//
-//        if faceTransform[0][2] < -slightlyThreshold {
-//            print("face is turned right")
-//        }
-//        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[0][2] {
-//            print("face is turned slightly right")
-//        }
-//        if faceTransform[0][2] > slightlyThreshold {
-//            print("face is turned left")
-//        }
-//        if centeredThreshold...slightlyThreshold ~= faceTransform[0][2] {
-//            print("face is turned slightly left")
-//        }
-        
         return faceTransform[0][2]
     }
     
     
     private func getVerticalOrientation(faceTransform: [[Float]]) -> Float {
-//        if -centeredThreshold...centeredThreshold ~= faceTransform[1][2] {
-//            print("centered in the vertical direction")
-//        }
-//        if (-slightlyThreshold)...(-centeredThreshold) ~= faceTransform[1][2] {
-//            print("face is slightly tilted up")
-//        }
-//        if faceTransform[1][2] < -slightlyThreshold {
-//            print("face is tilted up")
-//        }
-//        if centeredThreshold...slightlyThreshold ~= faceTransform[1][2] {
-//            print("face is slightly tilted down")
-//        }
-//        if faceTransform[1][2] > centeredThreshold {
-//            print("face is tilted down")
-//        }
-        
         return faceTransform[1][2]
     }
     

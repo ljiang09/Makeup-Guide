@@ -21,6 +21,10 @@ struct ContentView : View {
     
     @State var voiceoverOn: Bool = UserDefaults.standard.bool(forKey: "VoiceoversOn")  // need this in tandem with the user defaults because otherwise the UI doesn't update
     
+    // name for testing
+    @State var userName: String = ""
+    @State var showingTextField: Bool = false
+    
     var body: some View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
@@ -40,12 +44,35 @@ struct ContentView : View {
                     
                     Spacer()
                     
+                    
+                    
+                    if showingTextField {
+                        TextField("Insert your name here:", text: $userName)
+                        
+                        Button(action: {
+                            FirebaseHelpers.shared.userName = userName
+                            arManager.appIntro2()
+                        }, label: {
+                            Text("Done")
+                                .padding(30)
+                                .font(.system(size: UIScreen.main.bounds.width/13))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                        })
+                        .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
+                    }
+                    
                     if arManager.isSkipButtonShowing1 {
                         Button(action: {
                             soundHelpers.interruptVoiceover() {
                                 arManager.isSkipButtonShowing1 = false
                                 
-                                arManager.appIntro2()
+                                // arManager.appIntro2()
+                                
+                                // show text field
+                                showingTextField = true
                             }
                         }, label: {
                             Text("Done")

@@ -34,7 +34,6 @@ class ARSessionManager: NSObject, ObservableObject {
     @Published var isSkipButtonShowing2: Bool = false
     
     var faceTransform: [[Float]] = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]    // update face anchor transform when the session is collecting face info
-    var facePosition: FaceOrientations? = nil    // update the face position based on the Face Anchor Transform
     
     // fill this out as you collect the images
     var faceImages: [FaceOrientations: UIImage] = [:]  // slightly left, left, slightly right, right, center
@@ -139,7 +138,7 @@ class ARSessionManager: NSObject, ObservableObject {
         print("centering face")
         
         // 1. center face with immediate feedback
-        self.checkFaceUntilRepositioned(whichPosition: FaceOrientations.center) {
+        self.checkFaceUntilRepositioned(whichOrientation: FaceOrientations.center) {
             self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
             self.isCheckImageShowing = true
             
@@ -156,6 +155,7 @@ class ARSessionManager: NSObject, ObservableObject {
                                 print("collected slightly right")
                                 self.collectImageStart(whichImage: FaceOrientations.right) {
                                     print("collected right. Done")
+                                    // TODO: fill this flow out
                                 }
                             }
                         }
@@ -177,7 +177,7 @@ class ARSessionManager: NSObject, ObservableObject {
         self.soundHelper.announce(announcement: announcement) {
             
             // check face until slightly left. in the completion, run success sound and such
-            self.checkFaceUntilRepositioned(whichPosition: whichImage) {
+            self.checkFaceUntilRepositioned(whichOrientation: whichImage) {
                 self.soundHelper.playSound(soundName: "SuccessSound", dotExt: "wav")
                 self.isCheckImageShowing = true
                 
@@ -222,7 +222,8 @@ class ARSessionManager: NSObject, ObservableObject {
             let fileName: String = whichImage.rawValue
             
             /// send the image to Firebase to be stored
-            FirebaseHelpers.upload(imageData: uiImage.pngData()!, fileName: fileName)
+            FirebaseHelpers.shared.uploadTester(imageData: uiImage.pngData()!, fileName: fileName)
+//            FirebaseHelpers.upload(imageData: uiImage.pngData()!, fileName: fileName)
 
             sessionData.log(image: fileName)
         } else {
@@ -241,7 +242,8 @@ class ARSessionManager: NSObject, ObservableObject {
 
         // upload the image buffer to firebase
         if let data = imageBuffer.toUIImage()?.pngData() {
-            FirebaseHelpers.upload(imageData: data, fileName: "\(whichImage.rawValue)ImageBuffer")
+            FirebaseHelpers.shared.uploadTester(imageData: data, fileName: "\(whichImage.rawValue)ImageBuffer")
+//            FirebaseHelpers.upload(imageData: data, fileName: "\(whichImage.rawValue)ImageBuffer")
         }
     }
     
@@ -255,13 +257,16 @@ class ARSessionManager: NSObject, ObservableObject {
             return
         }
         
-        FirebaseHelpers.upload(fileName: "\(whichImage.rawValue)CameraInfo", cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+        print("")
+        
+        FirebaseHelpers.shared.uploadTester(fileName: "\(whichImage.rawValue)CameraInfo", cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
+//        FirebaseHelpers.upload(fileName: "\(whichImage.rawValue)CameraInfo", cameraTransform: cameraTransform, cameraIntrinsics: cameraIntrinsics)
     }
     
     
     /// runs a short timer where in every loop, the desired face position is checked against the current face position
     /// This current face position is updated every frame by the renderer delegate function
-    func checkFaceUntilRepositioned(whichPosition: FaceOrientations, completion: @escaping () -> Void) {
+    func checkFaceUntilRepositioned(whichOrientation: FaceOrientations, completion: @escaping () -> Void) {
         
         print("checking face until repositioned")
         
@@ -274,7 +279,7 @@ class ARSessionManager: NSObject, ObservableObject {
             // MARK: uncomment this if you want to get data for the python analysis
 //            print(self.faceTransform)
             
-            if whichPosition == self.facePosition {
+            if whichOrientation == CheckFaceHelper.shared.orientation {
                 faceCheckTimer.invalidate()
                 completion()
             }
@@ -344,6 +349,7 @@ extension ARSessionManager: ARSCNViewDelegate {
                              [x[1][0], x[1][1], x[1][2], x[1][3]],
                              [x[2][0], x[2][1], x[2][2], x[2][3]],
                              [x[3][0], x[3][1], x[3][2], x[3][3]]]
+            
             
             
             CheckFaceHelper.shared.getOrientation(faceTransform: faceTransform)

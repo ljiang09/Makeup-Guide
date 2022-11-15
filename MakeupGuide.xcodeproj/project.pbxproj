@@ -21,6 +21,10 @@
 		C4ABB1DA287F09B0009A3F0F /* CompareFaceTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ABB1D9287F09B0009A3F0F /* CompareFaceTextures.swift */; };
 		C4B0B6B828885C330055B375 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C4B0B6BA28885C330055B375 /* Localizable.strings */; };
 		C4B0B6CB288EF4840055B375 /* TimerControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B0B6CA288EF4840055B375 /* TimerControllers.swift */; };
+		C4D0405328EDD20700C741B2 /* tempArManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D0405228EDD20700C741B2 /* tempArManager.swift */; };
+		C4D0405528EDF50200C741B2 /* ImageCollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D0405428EDF50200C741B2 /* ImageCollectionManager.swift */; };
+		C4D0405828EE0A3600C741B2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D0405728EE0A3600C741B2 /* AppState.swift */; };
+		C4D0405A28EE0ABF00C741B2 /* StateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D0405928EE0ABF00C741B2 /* StateType.swift */; };
 		C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50880285912A60020EF3D /* AppDelegate.swift */; };
 		C4E50883285912A60020EF3D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E50882285912A60020EF3D /* ContentView.swift */; };
 		C4E50887285912AA0020EF3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4E50886285912AA0020EF3D /* Assets.xcassets */; };
@@ -65,6 +69,10 @@
 		C4B0B6BB28885C690055B375 /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C4B0B6BC28885CAD0055B375 /* en-AU */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-AU"; path = "en-AU.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C4B0B6CA288EF4840055B375 /* TimerControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControllers.swift; sourceTree = "<group>"; };
+		C4D0405228EDD20700C741B2 /* tempArManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tempArManager.swift; sourceTree = "<group>"; };
+		C4D0405428EDF50200C741B2 /* ImageCollectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionManager.swift; sourceTree = "<group>"; };
+		C4D0405728EE0A3600C741B2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C4D0405928EE0ABF00C741B2 /* StateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateType.swift; sourceTree = "<group>"; };
 		C4E5087D285912A60020EF3D /* MakeupGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeupGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4E50880285912A60020EF3D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C4E50882285912A60020EF3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -129,6 +137,15 @@
 			path = FaceTextureComparison;
 			sourceTree = "<group>";
 		};
+		C4D0405628EE0A0200C741B2 /* StateMachine */ = {
+			isa = PBXGroup;
+			children = (
+				C4D0405928EE0ABF00C741B2 /* StateType.swift */,
+				C4D0405728EE0A3600C741B2 /* AppState.swift */,
+			);
+			path = StateMachine;
+			sourceTree = "<group>";
+		};
 		C4E50874285912A50020EF3D = {
 			isa = PBXGroup;
 			children = (
@@ -155,6 +172,9 @@
 				C4E50880285912A60020EF3D /* AppDelegate.swift */,
 				C4E50882285912A60020EF3D /* ContentView.swift */,
 				C4E508B32859218D0020EF3D /* ARSessionManager.swift */,
+				C4D0405428EDF50200C741B2 /* ImageCollectionManager.swift */,
+				C4D0405628EE0A0200C741B2 /* StateMachine */,
+				C4D0405228EDD20700C741B2 /* tempArManager.swift */,
 				C44E806D2866374D00550CE8 /* FaceTexture */,
 				C4E508AE2859208D0020EF3D /* Helpers */,
 				C4F695932862353200C9E90A /* AudioFiles */,
@@ -356,13 +376,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				C44E80712866383C00550CE8 /* ARControllerTexture.swift in Sources */,
+				C4D0405328EDD20700C741B2 /* tempArManager.swift in Sources */,
 				C435EB492878B7AB007BA89B /* FirebaseHelpers.swift in Sources */,
 				C44E806F2866377400550CE8 /* FaceTextureGenerator.swift in Sources */,
 				C4E50883285912A60020EF3D /* ContentView.swift in Sources */,
 				C4F695922862206200C9E90A /* SoundHelpers.swift in Sources */,
+				C4D0405828EE0A3600C741B2 /* AppState.swift in Sources */,
 				C4B0B6CB288EF4840055B375 /* TimerControllers.swift in Sources */,
 				C4E508B42859218D0020EF3D /* ARSessionManager.swift in Sources */,
+				C4D0405A28EE0ABF00C741B2 /* StateType.swift in Sources */,
 				C4E508B2285920D00020EF3D /* CheckFaceHelper.swift in Sources */,
+				C4D0405528EDF50200C741B2 /* ImageCollectionManager.swift in Sources */,
 				C4E50881285912A60020EF3D /* AppDelegate.swift in Sources */,
 				C4E508AD28591FB50020EF3D /* VCGeneralHelpers.swift in Sources */,
 				C4675A5F287C6F3D008BE643 /* LogSessionData.swift in Sources */,
