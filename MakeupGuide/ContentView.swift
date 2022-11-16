@@ -29,10 +29,10 @@ struct ContentView : View {
         return ZStack(alignment: .center) {
             ARViewContainer().edgesIgnoringSafeArea(.all)
             
-            if (arManager.isTextShowing) {
-                VStack {
-                    Spacer()
-                    
+            VStack {
+                Spacer()
+                
+                if (arManager.isTextShowing) {
                     if (voiceoverOn) {
                         Spacer()
                         
@@ -45,25 +45,6 @@ struct ContentView : View {
                     Spacer()
                     
                     
-                    
-                    if showingTextField {
-                        TextField("Insert your name here:", text: $userName)
-                        
-                        Button(action: {
-                            FirebaseHelpers.shared.userName = userName
-                            arManager.appIntro2()
-                        }, label: {
-                            Text("Done")
-                                .padding(30)
-                                .font(.system(size: UIScreen.main.bounds.width/13))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                        })
-                        .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
-                    }
-                    
                     if arManager.isSkipButtonShowing1 {
                         Button(action: {
                             soundHelpers.interruptVoiceover() {
@@ -71,8 +52,11 @@ struct ContentView : View {
                                 
                                 // arManager.appIntro2()
                                 
+                                // TODO: I stepped in to check.. the code literally stops running after this button is clicked and idk whyyyyyy
+                                
                                 // show text field
                                 showingTextField = true
+                                arManager.isTextShowing = false
                             }
                         }, label: {
                             Text("Done")
@@ -103,6 +87,49 @@ struct ContentView : View {
                         })
                         .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
                     }
+                }
+                
+                
+                if showingTextField {
+                    if #available(iOS 15.0, *) {
+                        TextField(text: $userName,
+                                  prompt: Text("Name")
+                            .font(.system(size: UIScreen.main.bounds.width*0.05))
+                            .foregroundColor(.black)
+                        ) { Text("") }
+                            .font(.system(size: UIScreen.main.bounds.width*0.05))
+                            .foregroundColor(.black)
+                            .textInputAutocapitalization(.none)
+                            .disableAutocorrection(true)
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(.white)
+                            )
+                            .padding([.leading, .trailing])
+                    } else {
+                        // Fallback on earlier versions
+                        TextField("Name", text: $userName)
+                            .foregroundColor(.black)
+                            .font(.system(size: 25))
+                    }
+                    
+                    
+                    Spacer()
+
+                    Button(action: {
+                        showingTextField = false
+                        FirebaseHelpers.shared.userName = userName
+                        arManager.appIntro2()
+                    }, label: {
+                        Text("Done")
+                            .padding(30)
+                            .font(.system(size: UIScreen.main.bounds.width/13))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                    })
+                    .padding([.leading, .trailing], UIScreen.main.bounds.width/10)
                 }
             }
             

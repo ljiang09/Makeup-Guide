@@ -214,7 +214,7 @@ class ARSessionManager: NSObject, ObservableObject {
         if let uiImage: UIImage = textureToImage(faceUvGenerator.texture) {
             
             // Supposedly, since the user's face is centered before the first image is being taken, this should make the images be good.....
-            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+//            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
             
             // save the image in the class variable, accessible through the shared singleton
             self.faceImages[whichImage] = uiImage

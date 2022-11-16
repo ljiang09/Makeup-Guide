@@ -66,7 +66,7 @@ class SoundHelper: NSObject {
         currentAnnouncement = nil
         
         if let completion = self.announceCompletion {
-            print("5 completion should be happening here \(finishedAnnouncement)")
+//            print("5 completion should be happening here \(finishedAnnouncement)")
             announceCompletion = nil
             completion()
         }
